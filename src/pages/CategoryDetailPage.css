@@ -1,0 +1,139 @@
+.back-button {
+  background: white;
+  border: 2px solid #0078d4;
+  color: #0078d4;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+}
+
+.back-button:hover {
+  background: #0078d4;
+  color: white;
+  transform: translateX(-4px);
+}
+
+.category-hero {
+  border-radius: 24px;
+  padding: 64px 32px;
+  text-align: center;
+  margin-bottom: 48px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.category-hero-emoji {
+  font-size: 96px;
+  margin-bottom: 24px;
+  line-height: 1;
+}
+
+.category-hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #323130;
+  margin: 0 0 16px 0;
+  letter-spacing: -1px;
+}
+
+.category-hero-description {
+  font-size: 20px;
+  color: #605e5c;
+  margin: 0;
+}
+
+.level-selection {
+  margin-bottom: 48px;
+}
+
+.level-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #323130;
+  text-align: center;
+  margin: 0 0 32px 0;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.level-card {
+  background: white;
+  border: 3px solid #e1dfdd;
+  border-radius: 20px;
+  padding: 48px 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.level-card:hover:not(:disabled) {
+  transform: translateY(-8px);
+  border-color: #0078d4;
+  box-shadow: 0 12px 32px rgba(0, 120, 212, 0.2);
+}
+
+.level-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.level-card-icon {
+  font-size: 72px;
+  margin-bottom: 24px;
+  line-height: 1;
+}
+
+.level-card-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #323130;
+  margin: 0 0 12px 0;
+}
+
+.level-card-description {
+  font-size: 16px;
+  color: #605e5c;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.level-card-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0078d4;
+  background: rgba(0, 120, 212, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .category-hero {
+    padding: 48px 24px;
+  }
+
+  .category-hero-emoji {
+    font-size: 72px;
+  }
+
+  .category-hero-title {
+    font-size: 36px;
+  }
+
+  .category-hero-description {
+    font-size: 16px;
+  }
+
+  .level-grid {
+    grid-template-columns: 1fr;
+  }
+}
