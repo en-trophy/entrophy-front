@@ -1,0 +1,123 @@
+.practice-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f3f2f1 0%, #e1dfdd 100%);
+}
+
+.practice-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.practice-exit-button {
+  background: white;
+  border: 2px solid #d13438;
+  color: #d13438;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.practice-exit-button:hover {
+  background: #d13438;
+  color: white;
+}
+
+.practice-timer {
+  font-size: 18px;
+  font-weight: 700;
+  color: #323130;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.practice-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.practice-tips {
+  background: rgba(255, 215, 0, 0.15);
+  border-left: 4px solid #FFD700;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #323130;
+  line-height: 1.6;
+}
+
+.practice-complete-button {
+  background: linear-gradient(135deg, #16c60c 0%, #107c10 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(22, 198, 12, 0.3);
+}
+
+.practice-complete-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 198, 12, 0.4);
+}
+
+.practice-legend {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #605e5c;
+  font-weight: 600;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .practice-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .practice-timer {
+    text-align: center;
+  }
+
+  .practice-legend {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

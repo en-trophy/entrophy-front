@@ -1,0 +1,128 @@
+.list-header {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.list-header-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.list-header-emoji {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.list-header-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #323130;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.list-header-subtitle {
+  font-size: 16px;
+  color: #605e5c;
+  margin: 0;
+}
+
+.lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.lesson-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.lesson-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 120, 212, 0.15);
+}
+
+.lesson-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lesson-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #323130;
+  margin: 0;
+  flex: 1;
+}
+
+.lesson-card-difficulty {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 12px;
+  color: #323130;
+  white-space: nowrap;
+}
+
+.lesson-card-description {
+  font-size: 14px;
+  color: #605e5c;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+
+.lesson-card-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.lesson-card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+}
+
+.no-lessons {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 64px 24px;
+  color: #605e5c;
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .list-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .list-header-title {
+    font-size: 24px;
+  }
+
+  .lessons-grid {
+    grid-template-columns: 1fr;
+  }
+}
