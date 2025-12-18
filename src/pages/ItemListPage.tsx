@@ -15,10 +15,10 @@ export default function ItemListPage() {
   );
 
   if (!category) {
-    return <div>카테고리를 찾을 수 없습니다.</div>;
+    return <div>Category not found.</div>;
   }
 
-  const levelName = level === 'word' ? '단어' : '문장';
+  const levelName = level === 'word' ? 'Word' : 'Phrase';
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -36,11 +36,11 @@ export default function ItemListPage() {
   const getDifficultyLabel = (difficulty: string) => {
     switch (difficulty) {
       case 'EASY':
-        return '쉬움';
+        return 'Easy';
       case 'MEDIUM':
-        return '보통';
+        return 'Medium';
       case 'HARD':
-        return '어려움';
+        return 'Hard';
       default:
         return difficulty;
     }
@@ -52,7 +52,7 @@ export default function ItemListPage() {
         <Header />
 
         <button className="back-button" onClick={() => navigate(`/category/${categoryId}`)}>
-          ← 뒤로 가기
+          ← Back
         </button>
 
         <section className="list-header">
@@ -60,10 +60,10 @@ export default function ItemListPage() {
             <div className="list-header-emoji">{category.emoji}</div>
             <div>
               <h1 className="list-header-title">
-                {category.name} - {levelName} 학습
+                {category.name} - {levelName} Learning
               </h1>
               <p className="list-header-subtitle">
-                {filteredLessons.length}개의 레슨이 준비되어 있습니다
+                {filteredLessons.length} lessons available
               </p>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function ItemListPage() {
         <section className="lessons-grid">
           {filteredLessons.length === 0 ? (
             <div className="no-lessons">
-              <p>아직 준비된 레슨이 없습니다.</p>
+              <p>No lessons available yet.</p>
             </div>
           ) : (
             filteredLessons.map((lesson) => (
@@ -91,7 +91,7 @@ export default function ItemListPage() {
                   className="lesson-card-button"
                   onClick={() => navigate(`/lesson/${lesson.id}`)}
                 >
-                  학습하기 →
+                  Start Learning →
                 </button>
               </div>
             ))

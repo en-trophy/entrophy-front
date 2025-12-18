@@ -11,7 +11,7 @@ export default function CategoryDetailPage() {
   const category = categories.find((c) => c.id === categoryId);
 
   if (!category) {
-    return <div>카테고리를 찾을 수 없습니다.</div>;
+    return <div>Category not found.</div>;
   }
 
   // 해당 카테고리의 레슨 수 계산
@@ -28,7 +28,7 @@ export default function CategoryDetailPage() {
         <Header />
 
         <button className="back-button" onClick={() => navigate('/')}>
-          ← 홈으로
+          ← Back to Home
         </button>
 
         <section className="category-hero" style={{ backgroundColor: category.color }}>
@@ -38,7 +38,7 @@ export default function CategoryDetailPage() {
         </section>
 
         <section className="level-selection">
-          <h2 className="level-title">학습 레벨을 선택하세요</h2>
+          <h2 className="level-title">Choose a learning level</h2>
 
           <div className="level-grid">
             <button
@@ -47,11 +47,11 @@ export default function CategoryDetailPage() {
               disabled={wordCount === 0}
             >
               <div className="level-card-icon">📝</div>
-              <h3 className="level-card-title">단어 학습</h3>
+              <h3 className="level-card-title">Word Learning</h3>
               <p className="level-card-description">
-                기본 단어를 하나씩 배워보세요
+                Learn basic words one by one
               </p>
-              <div className="level-card-count">{wordCount}개 레슨</div>
+              <div className="level-card-count">{wordCount} lessons</div>
             </button>
 
             <button
@@ -60,11 +60,11 @@ export default function CategoryDetailPage() {
               disabled={phraseCount === 0}
             >
               <div className="level-card-icon">💬</div>
-              <h3 className="level-card-title">문장 학습</h3>
+              <h3 className="level-card-title">Phrase Learning</h3>
               <p className="level-card-description">
-                완전한 문장으로 표현해보세요
+                Practice expressing complete sentences
               </p>
-              <div className="level-card-count">{phraseCount}개 레슨</div>
+              <div className="level-card-count">{phraseCount} lessons</div>
             </button>
           </div>
         </section>

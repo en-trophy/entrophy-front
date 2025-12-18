@@ -11,7 +11,7 @@ export default function LessonDetailPage() {
   const lesson = lessons.find((l) => l.id === lessonId);
 
   if (!lesson) {
-    return <div>레슨을 찾을 수 없습니다.</div>;
+    return <div>Lesson not found.</div>;
   }
 
   const category = categories.find((c) => c.id === lesson.categoryId);
@@ -30,13 +30,13 @@ export default function LessonDetailPage() {
         <Header />
 
         <button className="back-button" onClick={handleGoBack}>
-          ← 목록으로
+          ← Back to List
         </button>
 
         <section className="lesson-detail">
           <div className="lesson-detail-header">
             <div className="lesson-detail-category">
-              {category?.emoji} {category?.name} / {lesson.level === 'word' ? '단어' : '문장'}
+              {category?.emoji} {category?.name} / {lesson.level === 'word' ? 'Word' : 'Phrase'}
             </div>
             <h1 className="lesson-detail-title">{lesson.title}</h1>
             <span className="lesson-detail-difficulty">{lesson.difficulty}</span>
@@ -44,25 +44,25 @@ export default function LessonDetailPage() {
 
           <div className="lesson-detail-content">
             <div className="lesson-detail-section">
-              <h2 className="lesson-section-title">설명</h2>
+              <h2 className="lesson-section-title">Description</h2>
               <p className="lesson-section-text">{lesson.description}</p>
             </div>
 
             <div className="lesson-detail-section">
-              <h2 className="lesson-section-title">학습 팁</h2>
+              <h2 className="lesson-section-title">Learning Tips</h2>
               <p className="lesson-section-text lesson-tips">{lesson.tips}</p>
             </div>
 
             <div className="lesson-detail-preview">
-              <h2 className="lesson-section-title">정답 미리보기</h2>
+              <h2 className="lesson-section-title">Answer Preview</h2>
               <div className="preview-placeholder">
                 <div className="preview-icon">👁️</div>
-                <p className="preview-text">실제 학습에서 정답 실루엣이 표시됩니다</p>
+                <p className="preview-text">The correct silhouette will be shown during the actual lesson</p>
               </div>
             </div>
 
             <button className="start-practice-button" onClick={handleStartPractice}>
-              학습 시작하기 🚀
+              Start Learning 🚀
             </button>
           </div>
         </section>
