@@ -1,46 +1,46 @@
 import type { LearningWord } from '../types';
 
-// 샘플 정답 포즈 데이터
-// 실제 프로젝트에서는 백엔드 API에서 가져옴
+// Sample answer pose data
+// In a real project, this would be fetched from a backend API
 export const sampleWords: LearningWord[] = [
   {
     id: 'love',
-    word: '사랑해',
+    word: 'Love',
     difficulty: 'EASY',
-    description: '가슴 위에 주먹을 올리는 동작',
+    description: 'A gesture of placing a fist over the chest',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
       joints: [
-        { id: 0, x: 0.5, y: 0.6 },   // 손목
-        { id: 1, x: 0.48, y: 0.55 }, // 엄지 1
-        { id: 2, x: 0.46, y: 0.5 },  // 엄지 2
-        { id: 3, x: 0.44, y: 0.45 }, // 엄지 3
-        { id: 4, x: 0.42, y: 0.4 },  // 엄지 끝
-        { id: 5, x: 0.52, y: 0.5 },  // 검지 1
-        { id: 6, x: 0.54, y: 0.45 }, // 검지 2
-        { id: 7, x: 0.56, y: 0.4 },  // 검지 3
-        { id: 8, x: 0.58, y: 0.35 }, // 검지 끝
-        { id: 9, x: 0.5, y: 0.48 },  // 중지 1
-        { id: 10, x: 0.5, y: 0.42 }, // 중지 2
-        { id: 11, x: 0.5, y: 0.36 }, // 중지 3
-        { id: 12, x: 0.5, y: 0.3 },  // 중지 끝
-        { id: 13, x: 0.48, y: 0.48 }, // 약지 1
-        { id: 14, x: 0.46, y: 0.42 }, // 약지 2
-        { id: 15, x: 0.44, y: 0.36 }, // 약지 3
-        { id: 16, x: 0.42, y: 0.3 },  // 약지 끝
-        { id: 17, x: 0.46, y: 0.5 },  // 새끼 1
-        { id: 18, x: 0.43, y: 0.45 }, // 새끼 2
-        { id: 19, x: 0.4, y: 0.4 },   // 새끼 3
-        { id: 20, x: 0.37, y: 0.35 }, // 새끼 끝
+        { id: 0, x: 0.5, y: 0.6 },   // Wrist
+        { id: 1, x: 0.48, y: 0.55 }, // Thumb 1
+        { id: 2, x: 0.46, y: 0.5 },  // Thumb 2
+        { id: 3, x: 0.44, y: 0.45 }, // Thumb 3
+        { id: 4, x: 0.42, y: 0.4 },  // Thumb tip
+        { id: 5, x: 0.52, y: 0.5 },  // Index finger 1
+        { id: 6, x: 0.54, y: 0.45 }, // Index finger 2
+        { id: 7, x: 0.56, y: 0.4 },  // Index finger 3
+        { id: 8, x: 0.58, y: 0.35 }, // Index finger tip
+        { id: 9, x: 0.5, y: 0.48 },  // Middle finger 1
+        { id: 10, x: 0.5, y: 0.42 }, // Middle finger 2
+        { id: 11, x: 0.5, y: 0.36 }, // Middle finger 3
+        { id: 12, x: 0.5, y: 0.3 },  // Middle finger tip
+        { id: 13, x: 0.48, y: 0.48 }, // Ring finger 1
+        { id: 14, x: 0.46, y: 0.42 }, // Ring finger 2
+        { id: 15, x: 0.44, y: 0.36 }, // Ring finger 3
+        { id: 16, x: 0.42, y: 0.3 },  // Ring finger tip
+        { id: 17, x: 0.46, y: 0.5 },  // Pinky finger 1
+        { id: 18, x: 0.43, y: 0.45 }, // Pinky finger 2
+        { id: 19, x: 0.4, y: 0.4 },   // Pinky finger 3
+        { id: 20, x: 0.37, y: 0.35 }, // Pinky finger tip
       ],
     },
   },
   {
     id: 'hello',
-    word: '안녕',
+    word: 'Hello',
     difficulty: 'EASY',
-    description: '손을 흔드는 동작',
+    description: 'A hand-waving gesture',
     pose: {
       handType: 'RIGHT',
       motionType: 'MOTION',
@@ -129,9 +129,9 @@ export const sampleWords: LearningWord[] = [
   },
   {
     id: 'thank-you',
-    word: '감사합니다',
+    word: 'Thank you',
     difficulty: 'MEDIUM',
-    description: '손을 모아 인사하는 동작',
+    description: 'A gesture of greeting with hands together',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',

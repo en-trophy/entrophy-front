@@ -1,16 +1,16 @@
 import type { Lesson } from '../types';
 
 export const lessons: Lesson[] = [
-  // ===== 인사 카테고리 =====
-  // 단어
+  // ===== Greetings Category =====
+  // Word
   {
     id: 'greeting-word-hello',
     categoryId: 'greeting',
     level: 'word',
-    title: '안녕',
+    title: 'Hello',
     difficulty: 'EASY',
-    description: '손을 흔드는 동작으로 인사합니다',
-    tips: '손바닥을 앞으로 향하게 하고 좌우로 흔들어주세요',
+    description: 'Greet by waving your hand',
+    tips: 'Face your palm forward and wave it side to side',
     pose: {
       handType: 'RIGHT',
       motionType: 'MOTION',
@@ -75,10 +75,10 @@ export const lessons: Lesson[] = [
     id: 'greeting-word-goodbye',
     categoryId: 'greeting',
     level: 'word',
-    title: '안녕히 가세요',
+    title: 'Goodbye',
     difficulty: 'EASY',
-    description: '작별 인사를 표현합니다',
-    tips: '손을 위아래로 흔들어주세요',
+    description: 'Expressing a farewell',
+    tips: 'Wave your hand up and down',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -107,15 +107,15 @@ export const lessons: Lesson[] = [
       ],
     },
   },
-  // 문장
+  // Phrase
   {
     id: 'greeting-phrase-nice-to-meet-you',
     categoryId: 'greeting',
     level: 'phrase',
-    title: '만나서 반가워요',
+    title: 'Nice to meet you',
     difficulty: 'MEDIUM',
-    description: '처음 만났을 때 사용하는 인사',
-    tips: '각 단어를 천천히 연결하여 표현하세요',
+    description: 'A greeting used when meeting someone for the first time',
+    tips: 'Express each word slowly and connect them',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -145,16 +145,16 @@ export const lessons: Lesson[] = [
     },
   },
 
-  // ===== 감정 카테고리 =====
-  // 단어
+  // ===== Emotions Category =====
+  // Word
   {
     id: 'emotion-word-love',
     categoryId: 'emotion',
     level: 'word',
-    title: '사랑해',
+    title: 'Love',
     difficulty: 'EASY',
-    description: '가슴 위에 주먹을 올리는 동작',
-    tips: '주먹을 가슴 가까이에 위치시키세요',
+    description: 'A gesture of placing a fist over the chest',
+    tips: 'Position your fist close to your chest',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -187,10 +187,10 @@ export const lessons: Lesson[] = [
     id: 'emotion-word-happy',
     categoryId: 'emotion',
     level: 'word',
-    title: '기뻐요',
+    title: 'Happy',
     difficulty: 'EASY',
-    description: '웃는 얼굴을 표현합니다',
-    tips: '양 손을 위로 올리며 표현하세요',
+    description: 'Expressing a smiling face',
+    tips: 'Raise both hands upwards to express',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -223,10 +223,10 @@ export const lessons: Lesson[] = [
     id: 'emotion-word-sad',
     categoryId: 'emotion',
     level: 'word',
-    title: '슬퍼요',
+    title: 'Sad',
     difficulty: 'EASY',
-    description: '눈물을 표현합니다',
-    tips: '손을 아래로 내리며 표현하세요',
+    description: 'Expressing tears',
+    tips: 'Lower your hand to express',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -255,15 +255,15 @@ export const lessons: Lesson[] = [
       ],
     },
   },
-  // 문장
+  // Phrase
   {
     id: 'emotion-phrase-i-love-you',
     categoryId: 'emotion',
     level: 'phrase',
-    title: '당신을 사랑해요',
+    title: 'I love you',
     difficulty: 'MEDIUM',
-    description: '사랑을 표현하는 완전한 문장',
-    tips: '"당신", "사랑해"를 순서대로 표현하세요',
+    description: 'A complete sentence to express love',
+    tips: 'Express "You" and "Love" in order',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -293,15 +293,15 @@ export const lessons: Lesson[] = [
     },
   },
 
-  // ===== 일상 카테고리 =====
+  // ===== Daily Life Category =====
   {
     id: 'daily-word-thank-you',
     categoryId: 'daily',
     level: 'word',
-    title: '감사합니다',
+    title: 'Thank you',
     difficulty: 'MEDIUM',
-    description: '손을 모아 인사하는 동작',
-    tips: '양손을 모아 앞으로 내밀어주세요',
+    description: 'A gesture of greeting with hands together',
+    tips: 'Bring your hands together and extend them forward',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -334,10 +334,10 @@ export const lessons: Lesson[] = [
     id: 'daily-word-sorry',
     categoryId: 'daily',
     level: 'word',
-    title: '미안해요',
+    title: 'Sorry',
     difficulty: 'EASY',
-    description: '사과하는 표현',
-    tips: '손을 가슴에 대고 표현하세요',
+    description: 'An expression of apology',
+    tips: 'Place your hand on your chest to express',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -367,15 +367,15 @@ export const lessons: Lesson[] = [
     },
   },
 
-  // ===== 가족 카테고리 =====
+  // ===== Family Category =====
   {
     id: 'family-word-mother',
     categoryId: 'family',
     level: 'word',
-    title: '엄마',
+    title: 'Mother',
     difficulty: 'EASY',
-    description: '어머니를 표현합니다',
-    tips: '손바닥을 펴서 표현하세요',
+    description: 'Expressing "mother"',
+    tips: 'Express with an open palm',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',
@@ -408,10 +408,10 @@ export const lessons: Lesson[] = [
     id: 'family-word-father',
     categoryId: 'family',
     level: 'word',
-    title: '아빠',
+    title: 'Father',
     difficulty: 'EASY',
-    description: '아버지를 표현합니다',
-    tips: '주먹을 쥐고 표현하세요',
+    description: 'Expressing "father"',
+    tips: 'Express with a clenched fist',
     pose: {
       handType: 'RIGHT',
       motionType: 'STATIC',

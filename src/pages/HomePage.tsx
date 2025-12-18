@@ -12,8 +12,8 @@ export default function HomePage() {
         <Header />
 
         <section className="hero-section">
-          <h2 className="hero-title">무엇을 배우고 싶으신가요?</h2>
-          <p className="hero-subtitle">카테고리를 선택하여 수어 학습을 시작하세요</p>
+          <h2 className="hero-title">What would you like to learn?</h2>
+          <p className="hero-subtitle">Select a category to start learning sign language</p>
         </section>
 
         <section className="categories-grid">
@@ -33,7 +33,7 @@ export default function HomePage() {
 
         <footer className="home-footer">
           <p className="home-footer-text">
-            청각 장애인 교육 접근성 향상을 위한 AI 수어 튜터
+            AI Sign Language Tutor for Improving Deaf Education Accessibility
           </p>
         </footer>
       </div>

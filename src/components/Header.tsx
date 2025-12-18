@@ -8,10 +8,10 @@ export default function Header() {
     <header className="header">
       <div className="header-content">
         <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <div className="header-logo-icon">👋</div>
+          <img src="/equal_sign_logo.png" alt="EqualSign Logo" width="100" height="100" />
           <h1 className="header-title">EqualSign</h1>
         </div>
-        <p className="header-subtitle">AI와 함께 배우는 수어 교육</p>
+        <p className="header-subtitle">Learn sign language with AI</p>
       </div>
       <div className="header-badge">
         <span className="header-badge-text">Powered by</span>

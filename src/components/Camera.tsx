@@ -37,8 +37,8 @@ export default function Camera({ targetPose, onScoreUpdate }: CameraProps) {
         };
       })
       .catch((err) => {
-        console.error('웹캠 접근 실패:', err);
-        alert('웹캠 접근 권한이 필요합니다.');
+        console.error('Failed to access webcam:', err);
+        alert('Webcam access is required.');
       });
 
     return () => {
@@ -152,7 +152,7 @@ export default function Camera({ targetPose, onScoreUpdate }: CameraProps) {
       />
       <canvas ref={canvasRef} className="camera-canvas" />
       {!isWebcamReady && (
-        <div className="camera-loading">웹캠을 불러오는 중...</div>
+        <div className="camera-loading">Loading webcam...</div>
       )}
     </div>
   );

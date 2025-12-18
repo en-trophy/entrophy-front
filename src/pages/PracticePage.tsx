@@ -23,7 +23,7 @@ export default function PracticePage() {
   }, []);
 
   if (!lesson) {
-    return <div>레슨을 찾을 수 없습니다.</div>;
+    return <div>Lesson not found.</div>;
   }
 
   const handleComplete = () => {
@@ -36,7 +36,7 @@ export default function PracticePage() {
   };
 
   const handleExit = () => {
-    const confirmed = window.confirm('학습을 종료하시겠습니까? 진행 상황은 저장되지 않습니다.');
+    const confirmed = window.confirm('Are you sure you want to exit? Your progress will not be saved.');
     if (confirmed) {
       navigate(`/lesson/${lesson.id}`);
     }
@@ -49,7 +49,7 @@ export default function PracticePage() {
 
         <div className="practice-header">
           <button className="practice-exit-button" onClick={handleExit}>
-            ← 나가기
+            ← Exit
           </button>
           <div className="practice-timer">⏱️ {Math.floor(practiceTime / 60)}:{(practiceTime % 60).toString().padStart(2, '0')}</div>
         </div>
@@ -60,25 +60,25 @@ export default function PracticePage() {
 
         <div className="practice-controls">
           <div className="practice-tips">
-            <strong>💡 팁:</strong> {lesson.tips}
+            <strong>💡 Tip:</strong> {lesson.tips}
           </div>
           <button className="practice-complete-button" onClick={handleComplete}>
-            학습 완료
+            Complete Learning
           </button>
         </div>
 
         <div className="practice-legend">
           <div className="legend-item">
             <span className="legend-color" style={{ background: '#00d26a' }} />
-            <span>정확</span>
+            <span>Accurate</span>
           </div>
           <div className="legend-item">
             <span className="legend-color" style={{ background: '#ffb800' }} />
-            <span>보통</span>
+            <span>Moderate</span>
           </div>
           <div className="legend-item">
             <span className="legend-color" style={{ background: '#ff4444' }} />
-            <span>오차</span>
+            <span>Error</span>
           </div>
         </div>
       </div>
