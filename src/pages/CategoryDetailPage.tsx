@@ -1,26 +1,82 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { categories } from '../data/categories';
-import { lessons } from '../data/lessons';
+import { backendApi } from '../services/api';
+import type { Category, Lesson } from '../types';
+import { getCategoryColor } from '../types';
 import Header from '../components/Header';
 import './CategoryDetailPage.css';
 
 export default function CategoryDetailPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
+  const [category, setCategory] = useState<Category | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const category = categories.find((c) => c.id === categoryId);
+  useEffect(() => {
+    loadData();
+  }, [categoryId]);
 
-  if (!category) {
-    return <div>Category not found.</div>;
+  const loadData = async () => {
+    if (!categoryId) return;
+
+    try {
+      setLoading(true);
+      const numericId = parseInt(categoryId, 10);
+
+      const [categoryData, lessonsData] = await Promise.all([
+        backendApi.getCategories(),
+        backendApi.getLessonsByCategory(numericId),
+      ]);
+
+      const foundCategory = categoryData.find((c) => c.id === numericId);
+      if (!foundCategory) {
+        setError('Category not found.');
+        return;
+      }
+
+      setCategory(foundCategory);
+      setLessons(lessonsData);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load data:', err);
+      setError('Failed to load data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // 해당 카테고리의 레슨 수 계산
-  const wordCount = lessons.filter(
-    (l) => l.categoryId === categoryId && l.level === 'word'
-  ).length;
-  const phraseCount = lessons.filter(
-    (l) => l.categoryId === categoryId && l.level === 'phrase'
-  ).length;
+  if (error || !category) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            {error || 'Category not found.'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 임시: type 구분 없이 전체 레슨 수 표시
+  const totalCount = lessons.length;
+  const wordCount = totalCount;
+  const phraseCount = totalCount;
 
   return (
     <div className="page">
@@ -31,8 +87,8 @@ export default function CategoryDetailPage() {
           ← Back to Home
         </button>
 
-        <section className="category-hero" style={{ backgroundColor: category.color }}>
-          <div className="category-hero-emoji">{category.emoji}</div>
+        <section className="category-hero" style={{ backgroundColor: getCategoryColor(category.code) }}>
+          <div className="category-hero-emoji">{category.iconEmoji}</div>
           <h1 className="category-hero-title">{category.name}</h1>
           <p className="category-hero-description">{category.description}</p>
         </section>

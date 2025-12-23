@@ -1,10 +1,61 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { categories } from '../data/categories';
+import { backendApi } from '../services/api';
+import type { Category } from '../types';
+import { getCategoryColor } from '../types';
 import Header from '../components/Header';
 import './HomePage.css';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      const data = await backendApi.getCategories();
+      console.log('📦 Categories from backend:', data);
+      setCategories(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
+      setError('Failed to load categories. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading categories...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -21,10 +72,10 @@ export default function HomePage() {
             <button
               key={category.id}
               className="category-card"
-              style={{ backgroundColor: category.color }}
+              style={{ backgroundColor: getCategoryColor(category.code) }}
               onClick={() => navigate(`/category/${category.id}`)}
             >
-              <div className="category-emoji">{category.emoji}</div>
+              <div className="category-emoji">{category.iconEmoji}</div>
               <h3 className="category-name">{category.name}</h3>
               <p className="category-description">{category.description}</p>
             </button>

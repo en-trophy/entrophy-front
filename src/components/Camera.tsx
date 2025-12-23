@@ -3,30 +3,23 @@ import Webcam from 'react-webcam';
 import { Holistic, Results, HAND_CONNECTIONS, POSE_CONNECTIONS } from '@mediapipe/holistic';
 import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
-import type { Joint, Pose } from '../types';
-import {
-  drawSkeleton,
-  drawUserSkeletonWithError,
-  calculateScore,
-} from '../utils/skeleton';
+import { aiApi } from '../services/api';
+import type { Pose } from '../types';
 import './Camera.css';
 
 interface CameraProps {
   targetPose: Pose | null;
-  lessonId?: string;
+  lessonId: string;
   onScoreUpdate?: (score: number) => void;
   onSuccess?: () => void;
 }
 
-export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess }: CameraProps) {
+export default function Camera({ lessonId, onScoreUpdate, onSuccess }: CameraProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const holisticRef = useRef<Holistic | null>(null);
   const lastSentTime = useRef<number>(0);
-  const animationFrameRef = useRef<number>();
   const [isWebcamReady, setIsWebcamReady] = useState(false);
-  const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
-  const [latestUserJoints, setLatestUserJoints] = useState<Joint[] | null>(null);
 
   // MediaPipe Holistic 초기화
   useEffect(() => {
@@ -74,6 +67,14 @@ export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess 
 
   // AI 서버로 데이터를 보내는 함수
   const sendFeedback = async (results: Results) => {
+    if (!lessonId) return;
+
+    const numericLessonId = parseInt(lessonId, 10);
+    if (isNaN(numericLessonId)) {
+      console.error('Invalid lessonId:', lessonId);
+      return;
+    }
+
     const payload = {
       target_word_id: 0,
       raw_landmarks: {
@@ -85,14 +86,8 @@ export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess 
     };
 
     try {
-      const response = await fetch('https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net/api/lessons/1/feedback', {
-        method: 'POST',
-        headers: { 'accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      console.log('Server response:', data);
+      const data = await aiApi.sendFeedback(numericLessonId, payload);
+      console.log('AI Server response:', data);
 
       // 서버에서 받은 score를 0~100으로 변환 (서버는 0~1 사이로 보냄)
       if (data.score !== undefined) {
@@ -104,25 +99,8 @@ export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess 
         console.log('Success! Sign language is correct.');
         onSuccess?.();
       }
-
-      // 손 좌표를 Joint 형식으로 변환 (canvas 그리기용)
-      if (results.rightHandLandmarks) {
-        const joints: Joint[] = results.rightHandLandmarks.map((lm, i) => ({
-          id: i,
-          x: lm.x,
-          y: lm.y,
-        }));
-        setLatestUserJoints(joints);
-      } else if (results.leftHandLandmarks) {
-        const joints: Joint[] = results.leftHandLandmarks.map((lm, i) => ({
-          id: i,
-          x: lm.x,
-          y: lm.y,
-        }));
-        setLatestUserJoints(joints);
-      }
     } catch (error) {
-      console.error('Failed to send feedback:', error);
+      console.error('Failed to send feedback to AI server:', error);
     }
   };
 
@@ -142,29 +120,7 @@ export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess 
     // Canvas 초기화
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 현재 프레임의 정답 joints 가져오기
-    let targetJoints: Joint[] | null = null;
-    if (targetPose) {
-      if (targetPose.motionType === 'STATIC') {
-        targetJoints = targetPose.joints;
-      } else {
-        targetJoints = targetPose.frames[currentFrameIndex].joints;
-      }
-
-      // 1) 정답 실루엣 그리기 (희미한 흰색)
-      drawSkeleton(ctx, targetJoints, {
-        lineWidth: 2,
-        strokeStyle: 'rgba(255, 255, 255, 0.6)',
-        fillStyle: 'rgba(255, 255, 255, 0.8)',
-      });
-    }
-
-    // 2) 사용자 skeleton + 오차 시각화
-    if (latestUserJoints && targetJoints) {
-      drawUserSkeletonWithError(ctx, targetJoints, latestUserJoints);
-    }
-
-    // 3) MediaPipe skeleton 그리기 (디버깅용)
+    // MediaPipe skeleton 그리기
     ctx.save();
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
@@ -198,17 +154,6 @@ export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess 
       camera.stop();
     };
   }, []);
-
-  // 모션 애니메이션 (프레임 전환)
-  useEffect(() => {
-    if (!targetPose || targetPose.motionType !== 'MOTION') return;
-
-    const interval = setInterval(() => {
-      setCurrentFrameIndex((prev) => (prev + 1) % targetPose.frames.length);
-    }, targetPose.frameIntervalMs);
-
-    return () => clearInterval(interval);
-  }, [targetPose]);
 
   return (
     <div className="camera-container">
