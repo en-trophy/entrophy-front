@@ -105,6 +105,99 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Success Modal */
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 64px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+  max-width: 500px;
+  width: 90%;
+}
+
+.success-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: bounce 0.6s ease;
+}
+
+.success-modal h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #16c60c;
+  margin-bottom: 16px;
+}
+
+.success-modal p {
+  font-size: 18px;
+  color: #605e5c;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.success-button {
+  background: linear-gradient(135deg, #16c60c 0%, #107c10 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(22, 198, 12, 0.3);
+}
+
+.success-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 198, 12, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 @media (max-width: 768px) {
   .practice-header {
     flex-direction: column;
@@ -119,5 +212,17 @@
   .practice-legend {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .success-modal {
+    padding: 32px 24px;
+  }
+
+  .success-modal h2 {
+    font-size: 28px;
+  }
+
+  .success-icon {
+    font-size: 64px;
   }
 }

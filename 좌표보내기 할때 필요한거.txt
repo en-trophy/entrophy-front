@@ -1,0 +1,126 @@
+# 1. 프로젝트 생성 (Vite + React + TypeScript)
+# 현재 폴더(.)에 생성하며, 기존 파일 삭제 옵션을 선택했습니다.
+npm create vite@latest . -- --template react-ts
+
+# 2. 기본 패키지 설치
+npm install
+
+# 3. 필요한 외부 라이브러리들 한 번에 설치
+npm install @mediapipe/holistic @mediapipe/camera_utils @mediapipe/drawing_utils react-webcam
+
+# 4. 로컬 개발 서버 실행
+npm run dev
+
+
+import React, { useEffect, useRef } from 'react';
+import Webcam from 'react-webcam';
+import { Holistic, Results, HAND_CONNECTIONS, POSE_CONNECTIONS, FACEMESH_TESSELATION } from '@mediapipe/holistic';
+import { Camera } from '@mediapipe/camera_utils';
+import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+
+const App: React.FC = () => {
+  const webcamRef = useRef<Webcam>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const holisticRef = useRef<Holistic | null>(null);
+  const lastSentTime = useRef<number>(0); // 전송 주기 조절용
+
+  // 1. 데이터를 서버 형식에 맞게 변환하는 함수
+  const formatLandmarks = (landmarks: any) => {
+    if (!landmarks) return [];
+    return landmarks.map((lm: any) => ({
+      x: lm.x, y: lm.y, z: lm.z, visibility: lm.visibility ?? 0,
+    }));
+  };
+
+  // 2. AI 서버로 데이터를 보내는 함수 (JSON 형식 일치)
+  const sendFeedback = async (results: Results) => {
+    const currentTime = Date.now();
+    if (currentTime - lastSentTime.current < 500) return; // 0.5초마다 전송
+    lastSentTime.current = currentTime;
+
+    const payload = {
+      target_word_id: 0,
+      raw_landmarks: {
+        face_landmarks: formatLandmarks(results.faceLandmarks),
+        pose_landmarks: formatLandmarks(results.poseLandmarks),
+        left_hand_landmarks: formatLandmarks(results.leftHandLandmarks),
+        right_hand_landmarks: formatLandmarks(results.rightHandLandmarks),
+      }
+    };
+
+    try {
+      await fetch('https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net/api/lessons/1/feedback', {
+        method: 'POST',
+        headers: { 'accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      console.log("✅ 서버 전송 성공");
+    } catch (error) {
+      console.error("❌ 전송 실패 (CORS 확인 필요):", error);
+    }
+  };
+
+  useEffect(() => {
+    // MediaPipe 초기화
+    holisticRef.current = new Holistic({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+    });
+
+    holisticRef.current.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    // 결과 처리 로직
+    holisticRef.current.onResults((results: Results) => {
+      sendFeedback(results); // 서버 전송
+
+      if (canvasRef.current && webcamRef.current?.video) {
+        const videoWidth = webcamRef.current.video.videoWidth;
+        const videoHeight = webcamRef.current.video.videoHeight;
+        canvasRef.current.width = videoWidth;
+        canvasRef.current.height = videoHeight;
+        const canvasCtx = canvasRef.current.getContext('2d');
+
+        if (canvasCtx) {
+          canvasCtx.save();
+          // 좌우 반전 처리
+          canvasCtx.translate(videoWidth, 0);
+          canvasCtx.scale(-1, 1);
+          canvasCtx.clearRect(0, 0, videoWidth, videoHeight);
+
+          // 점선 그리기
+          drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
+          drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#FF0000', lineWidth: 2 });
+          drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#0000FF', lineWidth: 2 });
+          canvasCtx.restore();
+        }
+      }
+    });
+
+    // 카메라 구동
+    if (webcamRef.current?.video) {
+      const camera = new Camera(webcamRef.current.video, {
+        onFrame: async () => {
+          if (webcamRef.current?.video) await holisticRef.current?.send({ image: webcamRef.current.video });
+        },
+        width: 640, height: 480,
+      });
+      camera.start();
+    }
+  }, []);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <h1>Sign Language AI Feedback</h1>
+      <div style={{ position: 'relative', width: '640px', height: '480px', borderRadius: '15px', overflow: 'hidden' }}>
+        <Webcam ref={webcamRef} mirrored={true} style={{ position: 'absolute', width: '100%', height: '100%' }} />
+        <canvas ref={canvasRef} style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 1 }} />
+      </div>
+    </div>
+  );
+};
+
+export default App;

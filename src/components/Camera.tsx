@@ -1,4 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import Webcam from 'react-webcam';
+import { Holistic, Results, HAND_CONNECTIONS, POSE_CONNECTIONS } from '@mediapipe/holistic';
+import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
+import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import type { Joint, Pose } from '../types';
 import {
   drawSkeleton,
@@ -9,83 +13,138 @@ import './Camera.css';
 
 interface CameraProps {
   targetPose: Pose | null;
+  lessonId?: string;
   onScoreUpdate?: (score: number) => void;
+  onSuccess?: () => void;
 }
 
-export default function Camera({ targetPose, onScoreUpdate }: CameraProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export default function Camera({ targetPose, lessonId, onScoreUpdate, onSuccess }: CameraProps) {
+  const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const holisticRef = useRef<Holistic | null>(null);
+  const lastSentTime = useRef<number>(0);
   const animationFrameRef = useRef<number>();
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(0);
-
-  // 임시: 사용자 joints (나중에 AI 서버에서 받아올 데이터)
   const [latestUserJoints, setLatestUserJoints] = useState<Joint[] | null>(null);
 
-  // 웹캠 초기화
+  // MediaPipe Holistic 초기화
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    holisticRef.current = new Holistic({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+    });
 
-    navigator.mediaDevices
-      .getUserMedia({ video: { width: 1280, height: 720 } })
-      .then((stream) => {
-        video.srcObject = stream;
-        video.onloadedmetadata = () => {
-          video.play();
-          setIsWebcamReady(true);
-        };
-      })
-      .catch((err) => {
-        console.error('Failed to access webcam:', err);
-        alert('Webcam access is required.');
-      });
+    holisticRef.current.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    holisticRef.current.onResults(onHolisticResults);
 
     return () => {
-      if (video.srcObject) {
-        const stream = video.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
+      holisticRef.current?.close();
+    };
+  }, [lessonId]);
+
+  // 데이터를 서버 형식에 맞게 변환하는 함수
+  const formatLandmarks = (landmarks: any) => {
+    if (!landmarks) return [];
+    return landmarks.map((lm: any) => ({
+      x: lm.x,
+      y: lm.y,
+      z: lm.z,
+      visibility: lm.visibility ?? 0,
+    }));
+  };
+
+  // MediaPipe 결과 처리
+  const onHolisticResults = async (results: Results) => {
+    // AI 서버로 데이터 전송 (0.5초마다)
+    const currentTime = Date.now();
+    if (currentTime - lastSentTime.current >= 500) {
+      lastSentTime.current = currentTime;
+      await sendFeedback(results);
+    }
+
+    // Canvas에 skeleton 그리기
+    drawSkeletonOnCanvas(results);
+  };
+
+  // AI 서버로 데이터를 보내는 함수
+  const sendFeedback = async (results: Results) => {
+    const payload = {
+      target_word_id: 0,
+      raw_landmarks: {
+        face_landmarks: formatLandmarks(results.faceLandmarks),
+        pose_landmarks: formatLandmarks(results.poseLandmarks),
+        left_hand_landmarks: formatLandmarks(results.leftHandLandmarks),
+        right_hand_landmarks: formatLandmarks(results.rightHandLandmarks),
       }
     };
-  }, []);
 
-  // Canvas 크기 설정
-  useEffect(() => {
-    const video = videoRef.current;
+    try {
+      const response = await fetch('https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net/api/lessons/1/feedback', {
+        method: 'POST',
+        headers: { 'accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      console.log('Server response:', data);
+
+      // 서버에서 받은 score를 0~100으로 변환 (서버는 0~1 사이로 보냄)
+      if (data.score !== undefined) {
+        onScoreUpdate?.(Math.round(data.score * 100));
+      }
+
+      // 성공 판정
+      if (data.isCorrect) {
+        console.log('Success! Sign language is correct.');
+        onSuccess?.();
+      }
+
+      // 손 좌표를 Joint 형식으로 변환 (canvas 그리기용)
+      if (results.rightHandLandmarks) {
+        const joints: Joint[] = results.rightHandLandmarks.map((lm, i) => ({
+          id: i,
+          x: lm.x,
+          y: lm.y,
+        }));
+        setLatestUserJoints(joints);
+      } else if (results.leftHandLandmarks) {
+        const joints: Joint[] = results.leftHandLandmarks.map((lm, i) => ({
+          id: i,
+          x: lm.x,
+          y: lm.y,
+        }));
+        setLatestUserJoints(joints);
+      }
+    } catch (error) {
+      console.error('Failed to send feedback:', error);
+    }
+  };
+
+  // Canvas에 skeleton 그리기
+  const drawSkeletonOnCanvas = (results: Results) => {
     const canvas = canvasRef.current;
-    if (!video || !canvas || !isWebcamReady) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-  }, [isWebcamReady]);
-
-  // 모션 애니메이션 (프레임 전환)
-  useEffect(() => {
-    if (!targetPose || targetPose.motionType !== 'MOTION') return;
-
-    const interval = setInterval(() => {
-      setCurrentFrameIndex((prev) => (prev + 1) % targetPose.frames.length);
-    }, targetPose.frameIntervalMs);
-
-    return () => clearInterval(interval);
-  }, [targetPose]);
-
-  // 렌더링 루프
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isWebcamReady || !targetPose) return;
+    const video = webcamRef.current?.video;
+    if (!canvas || !video) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    function renderLoop() {
-      if (!ctx || !canvas || !targetPose) return;
+    // Canvas 크기 설정
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-      // Canvas 초기화
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Canvas 초기화
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 현재 프레임의 정답 joints 가져오기
-      let targetJoints: Joint[];
+    // 현재 프레임의 정답 joints 가져오기
+    let targetJoints: Joint[] | null = null;
+    if (targetPose) {
       if (targetPose.motionType === 'STATIC') {
         targetJoints = targetPose.joints;
       } else {
@@ -98,57 +157,66 @@ export default function Camera({ targetPose, onScoreUpdate }: CameraProps) {
         strokeStyle: 'rgba(255, 255, 255, 0.6)',
         fillStyle: 'rgba(255, 255, 255, 0.8)',
       });
-
-      // 2) 사용자 skeleton + 오차 시각화
-      if (latestUserJoints) {
-        drawUserSkeletonWithError(ctx, targetJoints, latestUserJoints);
-
-        // 점수 계산 및 업데이트
-        const score = calculateScore(targetJoints, latestUserJoints);
-        onScoreUpdate?.(score);
-      }
-
-      animationFrameRef.current = requestAnimationFrame(renderLoop);
     }
 
-    renderLoop();
+    // 2) 사용자 skeleton + 오차 시각화
+    if (latestUserJoints && targetJoints) {
+      drawUserSkeletonWithError(ctx, targetJoints, latestUserJoints);
+    }
+
+    // 3) MediaPipe skeleton 그리기 (디버깅용)
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+
+    drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
+    drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#FF0000', lineWidth: 2 });
+    drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#0000FF', lineWidth: 2 });
+
+    ctx.restore();
+  };
+
+  // 웹캠 준비 완료 후 MediaPipe Camera 시작
+  useEffect(() => {
+    const video = webcamRef.current?.video;
+    if (!video || !holisticRef.current) return;
+
+    const camera = new MediaPipeCamera(video, {
+      onFrame: async () => {
+        if (webcamRef.current?.video && holisticRef.current) {
+          await holisticRef.current.send({ image: webcamRef.current.video });
+        }
+      },
+      width: 640,
+      height: 480,
+    });
+
+    camera.start();
+    setIsWebcamReady(true);
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      camera.stop();
     };
-  }, [isWebcamReady, targetPose, currentFrameIndex, latestUserJoints, onScoreUpdate]);
+  }, []);
 
-  // TODO: AI 서버 호출 (0.3~0.5초마다)
+  // 모션 애니메이션 (프레임 전환)
   useEffect(() => {
-    if (!isWebcamReady) return;
+    if (!targetPose || targetPose.motionType !== 'MOTION') return;
 
-    // 임시: 테스트용 더미 데이터 생성
     const interval = setInterval(() => {
-      // 나중에 여기서 video 프레임을 캡처해서 AI 서버로 전송
-      // 그리고 응답으로 받은 userJoints를 setLatestUserJoints에 설정
-
-      // 임시 더미 데이터 (실제로는 AI 서버 응답)
-      const dummyUserJoints: Joint[] = Array.from({ length: 21 }, (_, i) => ({
-        id: i,
-        x: 0.4 + Math.random() * 0.2,
-        y: 0.3 + Math.random() * 0.4,
-      }));
-      setLatestUserJoints(dummyUserJoints);
-    }, 500); // 0.5초마다
+      setCurrentFrameIndex((prev) => (prev + 1) % targetPose.frames.length);
+    }, targetPose.frameIntervalMs);
 
     return () => clearInterval(interval);
-  }, [isWebcamReady]);
+  }, [targetPose]);
 
   return (
     <div className="camera-container">
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
+      <Webcam
+        ref={webcamRef}
+        mirrored={true}
         className="camera-video"
+        videoConstraints={{ width: 640, height: 480 }}
       />
       <canvas ref={canvasRef} className="camera-canvas" />
       {!isWebcamReady && (

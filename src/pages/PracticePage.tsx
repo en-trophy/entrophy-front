@@ -11,6 +11,7 @@ export default function PracticePage() {
   const navigate = useNavigate();
   const [score, setScore] = useState(0);
   const [practiceTime, setPracticeTime] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const lesson = lessons.find((l) => l.id === lessonId);
 
@@ -25,6 +26,10 @@ export default function PracticePage() {
   if (!lesson) {
     return <div>Lesson not found.</div>;
   }
+
+  const handleSuccess = () => {
+    setShowSuccessModal(true);
+  };
 
   const handleComplete = () => {
     navigate(`/result/${lesson.id}`, {
@@ -56,7 +61,12 @@ export default function PracticePage() {
 
         <ScoreBoard score={score} targetWord={lesson.title} />
 
-        <Camera targetPose={lesson.pose} onScoreUpdate={setScore} />
+        <Camera
+          targetPose={lesson.pose}
+          lessonId={lessonId}
+          onScoreUpdate={setScore}
+          onSuccess={handleSuccess}
+        />
 
         <div className="practice-controls">
           <div className="practice-tips">
@@ -82,6 +92,20 @@ export default function PracticePage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay" onClick={handleComplete}>
+          <div className="success-modal">
+            <div className="success-icon">🎉</div>
+            <h2>Success!</h2>
+            <p>You've successfully performed the sign language!</p>
+            <button className="success-button" onClick={handleComplete}>
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
