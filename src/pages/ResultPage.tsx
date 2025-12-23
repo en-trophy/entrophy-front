@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { lessons } from '../data/lessons';
-import { categories } from '../data/categories';
+import { backendApi } from '../services/api';
+import type { Lesson } from '../types';
 import Header from '../components/Header';
 import './ResultPage.css';
 
@@ -8,22 +9,62 @@ export default function ResultPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-
-  const lesson = lessons.find((l) => l.id === lessonId);
-  const category = categories.find((c) => c.id === lesson?.categoryId);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [recommendedLessons, setRecommendedLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Get score and time from location.state
   const finalScore = (location.state as any)?.finalScore || 0;
   const practiceTime = (location.state as any)?.practiceTime || 0;
 
-  if (!lesson) {
-    return <div>Lesson not found.</div>;
+  useEffect(() => {
+    loadData();
+  }, [lessonId]);
+
+  const loadData = async () => {
+    if (!lessonId) return;
+
+    try {
+      const numericId = parseInt(lessonId, 10);
+      const lessonData = await backendApi.getLesson(numericId);
+      setLesson(lessonData);
+
+      // Load recommended lessons from the same category
+      const categoryLessons = await backendApi.getLessonsByCategory(lessonData.categoryId);
+      const filtered = categoryLessons.filter((l) => l.id !== numericId).slice(0, 3);
+      setRecommendedLessons(filtered);
+    } catch (err) {
+      console.error('Failed to load result data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Recommend other lessons from the same category
-  const recommendedLessons = lessons
-    .filter((l) => l.categoryId === lesson.categoryId && l.id !== lesson.id)
-    .slice(0, 3);
+  if (!lesson) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            Lesson not found.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getScoreMessage = (score: number): string => {
     if (score >= 90) return 'Perfect! 🎉';
@@ -95,7 +136,7 @@ export default function ResultPage() {
           </button>
           <button
             className="result-button result-button-list"
-            onClick={() => navigate(`/category/${lesson.categoryId}/${lesson.level}`)}
+            onClick={() => navigate(`/category/${lesson.categoryId}/${lesson.type}`)}
           >
             📝 Back to List
           </button>
@@ -114,7 +155,7 @@ export default function ResultPage() {
               {recommendedLessons.map((rec) => (
                 <div key={rec.id} className="recommended-card">
                   <h3 className="recommended-title">{rec.title}</h3>
-                  <p className="recommended-description">{rec.description}</p>
+                  <p className="recommended-description">{rec.signLanguage}</p>
                   <button
                     className="recommended-button"
                     onClick={() => navigate(`/lesson/${rec.id}`)}

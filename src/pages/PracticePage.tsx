@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { lessons } from '../data/lessons';
+import { backendApi } from '../services/api';
+import type { Lesson } from '../types';
 import Camera from '../components/Camera';
 import ScoreBoard from '../components/ScoreBoard';
 import Header from '../components/Header';
@@ -9,10 +10,15 @@ import './PracticePage.css';
 export default function PracticePage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
+  const [lesson, setLesson] = useState<Lesson | null>(null);
   const [score, setScore] = useState(0);
   const [practiceTime, setPracticeTime] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const lesson = lessons.find((l) => l.id === lessonId);
+  useEffect(() => {
+    loadLesson();
+  }, [lessonId]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -22,25 +28,67 @@ export default function PracticePage() {
     return () => clearInterval(timer);
   }, []);
 
-  if (!lesson) {
-    return <div>Lesson not found.</div>;
-  }
+  const loadLesson = async () => {
+    if (!lessonId) return;
+
+    try {
+      const numericId = parseInt(lessonId, 10);
+      const data = await backendApi.getLesson(numericId);
+      setLesson(data);
+    } catch (err) {
+      console.error('Failed to load lesson:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuccess = () => {
+    setShowSuccessModal(true);
+  };
 
   const handleComplete = () => {
-    navigate(`/result/${lesson.id}`, {
-      state: {
-        finalScore: score,
-        practiceTime,
-      },
-    });
+    if (lesson) {
+      navigate(`/result/${lesson.id}`, {
+        state: {
+          finalScore: score,
+          practiceTime,
+        },
+      });
+    }
   };
 
   const handleExit = () => {
     const confirmed = window.confirm('Are you sure you want to exit? Your progress will not be saved.');
-    if (confirmed) {
+    if (confirmed && lesson) {
       navigate(`/lesson/${lesson.id}`);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="practice-page">
+        <div className="practice-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!lesson) {
+    return (
+      <div className="practice-page">
+        <div className="practice-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            Lesson not found.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="practice-page">
@@ -56,12 +104,19 @@ export default function PracticePage() {
 
         <ScoreBoard score={score} targetWord={lesson.title} />
 
-        <Camera targetPose={lesson.pose} onScoreUpdate={setScore} />
+        <Camera
+          targetPose={null}
+          lessonId={lesson.id.toString()}
+          onScoreUpdate={setScore}
+          onSuccess={handleSuccess}
+        />
 
         <div className="practice-controls">
-          <div className="practice-tips">
-            <strong>💡 Tip:</strong> {lesson.tips}
-          </div>
+          {lesson.signLanguage && (
+            <div className="practice-tips">
+              <strong>💡 Tip:</strong> {lesson.signLanguage}
+            </div>
+          )}
           <button className="practice-complete-button" onClick={handleComplete}>
             Complete Learning
           </button>
@@ -82,6 +137,20 @@ export default function PracticePage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay" onClick={handleComplete}>
+          <div className="success-modal">
+            <div className="success-icon">🎉</div>
+            <h2>Success!</h2>
+            <p>You've successfully performed the sign language!</p>
+            <button className="success-button" onClick={handleComplete}>
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,28 +1,76 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { lessons } from '../data/lessons';
-import { categories } from '../data/categories';
+import { backendApi } from '../services/api';
+import type { Lesson } from '../types';
+import { mapDifficulty } from '../types';
 import Header from '../components/Header';
 import './LessonDetailPage.css';
 
 export default function LessonDetailPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const lesson = lessons.find((l) => l.id === lessonId);
+  useEffect(() => {
+    loadLesson();
+  }, [lessonId]);
 
-  if (!lesson) {
-    return <div>Lesson not found.</div>;
-  }
+  const loadLesson = async () => {
+    if (!lessonId) return;
 
-  const category = categories.find((c) => c.id === lesson.categoryId);
+    try {
+      setLoading(true);
+      const numericId = parseInt(lessonId, 10);
+      const data = await backendApi.getLesson(numericId);
+      setLesson(data);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load lesson:', err);
+      setError('Failed to load lesson. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStartPractice = () => {
-    navigate(`/practice/${lesson.id}`);
+    if (lesson) {
+      navigate(`/practice/${lesson.id}`);
+    }
   };
 
   const handleGoBack = () => {
-    navigate(`/category/${lesson.categoryId}/${lesson.level}`);
+    if (lesson) {
+      navigate(`/category/${lesson.categoryId}/${lesson.type}`);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !lesson) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            {error || 'Lesson not found.'}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -36,28 +84,30 @@ export default function LessonDetailPage() {
         <section className="lesson-detail">
           <div className="lesson-detail-header">
             <div className="lesson-detail-category">
-              {category?.emoji} {category?.name} / {lesson.level === 'word' ? 'Word' : 'Phrase'}
+              {lesson.categoryName} / {lesson.type === 'word' ? 'Word' : 'Phrase'}
             </div>
             <h1 className="lesson-detail-title">{lesson.title}</h1>
-            <span className="lesson-detail-difficulty">{lesson.difficulty}</span>
+            <span className="lesson-detail-difficulty">{mapDifficulty(lesson.difficulty)}</span>
           </div>
 
           <div className="lesson-detail-content">
             <div className="lesson-detail-section">
-              <h2 className="lesson-section-title">Description</h2>
-              <p className="lesson-section-text">{lesson.description}</p>
+              <h2 className="lesson-section-title">Sign Language</h2>
+              <p className="lesson-section-text">{lesson.signLanguage}</p>
             </div>
 
-            <div className="lesson-detail-section">
-              <h2 className="lesson-section-title">Learning Tips</h2>
-              <p className="lesson-section-text lesson-tips">{lesson.tips}</p>
-            </div>
+            {lesson.videoUrl && (
+              <div className="lesson-detail-section">
+                <h2 className="lesson-section-title">Video Tutorial</h2>
+                <video src={lesson.videoUrl} controls className="lesson-video" />
+              </div>
+            )}
 
             <div className="lesson-detail-preview">
-              <h2 className="lesson-section-title">Answer Preview</h2>
+              <h2 className="lesson-section-title">Practice Preview</h2>
               <div className="preview-placeholder">
                 <div className="preview-icon">👁️</div>
-                <p className="preview-text">The correct silhouette will be shown during the actual lesson</p>
+                <p className="preview-text">Use your webcam to practice sign language in real-time</p>
               </div>
             </div>
 

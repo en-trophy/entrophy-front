@@ -1,8 +1,8 @@
 // Joint 좌표 (0~1로 정규화된 좌표)
 export interface Joint {
   id: number;
-  x: number; // 0~1 (왼쪽 0, 오른쪽 1)
-  y: number; // 0~1 (위 0, 아래 1)
+  x: number;
+  y: number;
 }
 
 // 정답 포즈 (정적인 수어 동작)
@@ -18,18 +18,18 @@ export interface PoseFrame {
   joints: Joint[];
 }
 
-// 모션 포즈 (움직이는 수어 동작, 예: "안녕")
+// 모션 포즈 (움직이는 수어 동작)
 export interface MotionPose {
   handType: 'LEFT' | 'RIGHT';
   motionType: 'MOTION';
-  frameIntervalMs: number; // 프레임 간격 (밀리초)
+  frameIntervalMs: number;
   frames: PoseFrame[];
 }
 
-// 포즈 타입 (정적 또는 모션)
+// 포즈 타입
 export type Pose = StaticPose | MotionPose;
 
-// AI 서버 응답 (사용자 관절 데이터)
+// AI 서버 응답
 export interface UserPoseResponse {
   userJoints: Joint[];
   score?: number;
@@ -39,13 +39,13 @@ export interface UserPoseResponse {
 // 관절별 오차 정보
 export interface JointError {
   id: number;
-  error: number; // 오차 거리
+  error: number;
 }
 
 // 학습할 단어 정보
 export interface LearningWord {
   id: string;
-  word: string; // 예: "사랑해", "안녕"
+  word: string;
   pose: Pose;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   description?: string;
@@ -60,27 +60,63 @@ export interface LearningSession {
   timestamp: number;
 }
 
-// 카테고리 (홈 화면에서 선택)
+// 카테고리
 export interface Category {
-  id: string;
+  id: number;
+  code: string;
   name: string;
-  emoji: string;
+  iconEmoji: string;
   description: string;
-  color: string; // 카드 배경색
+  color?: string;
 }
 
-// 레슨 레벨 (단어 vs 문장)
+// 레슨 레벨
 export type LessonLevel = 'word' | 'phrase';
 
-// 레슨 정보 (LearningWord 확장)
+// 레슨 정보
 export interface Lesson {
-  id: string;
-  categoryId: string;
-  level: LessonLevel;
+  id: number;
+  categoryId: number;
+  categoryName: string;
   title: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  description: string;
-  tips: string; // 손모양 팁, 사용 상황
-  pose: Pose;
-  thumbnail?: string;
+  signLanguage: string;
+  difficulty: number;
+  type: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  description?: string;
+  tips?: string;
+  pose?: Pose;
+}
+
+// Difficulty 매핑
+export function mapDifficulty(level: number): 'EASY' | 'MEDIUM' | 'HARD' {
+  if (level <= 2) return 'EASY';
+  if (level <= 4) return 'MEDIUM';
+  return 'HARD';
+}
+
+// 문자열을 해시값으로 변환
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+// Category 색상 자동 생성 (code 기반 일관성 있는 색상)
+export function getCategoryColor(code: string): string {
+  // code를 해시하여 0-360 사이의 색조(hue) 값 생성
+  const hash = hashCode(code);
+  const hue = hash % 360;
+
+  // 파스텔 톤의 밝고 부드러운 색상 생성
+  // 채도(saturation) 70%, 명도(lightness) 80%
+  const color = `hsl(${hue}, 70%, 80%)`;
+
+  console.log(`🎨 Auto color: "${code}" → hue ${hue} → ${color}`);
+  return color;
 }

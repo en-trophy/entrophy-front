@@ -1,27 +1,57 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { categories } from '../data/categories';
-import { lessons } from '../data/lessons';
-import type { LessonLevel } from '../types';
+import { backendApi } from '../services/api';
+import type { Category, Lesson } from '../types';
+import { mapDifficulty } from '../types';
 import Header from '../components/Header';
 import './ItemListPage.css';
 
 export default function ItemListPage() {
-  const { categoryId, level } = useParams<{ categoryId: string; level: LessonLevel }>();
+  const { categoryId, level } = useParams<{ categoryId: string; level: string }>();
   const navigate = useNavigate();
+  const [category, setCategory] = useState<Category | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const category = categories.find((c) => c.id === categoryId);
-  const filteredLessons = lessons.filter(
-    (l) => l.categoryId === categoryId && l.level === level
-  );
+  useEffect(() => {
+    loadData();
+  }, [categoryId, level]);
 
-  if (!category) {
-    return <div>Category not found.</div>;
-  }
+  const loadData = async () => {
+    if (!categoryId) return;
 
-  const levelName = level === 'word' ? 'Word' : 'Phrase';
+    try {
+      setLoading(true);
+      const numericId = parseInt(categoryId, 10);
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
+      const [categoryData, lessonsData] = await Promise.all([
+        backendApi.getCategories(),
+        backendApi.getLessonsByCategory(numericId),
+      ]);
+
+      const foundCategory = categoryData.find((c) => c.id === numericId);
+      if (!foundCategory) {
+        setError('Category not found.');
+        return;
+      }
+
+      // 임시: type 필터링 제거 (백엔드에 word/phrase 구분 없음)
+      // 모든 레슨을 word, phrase 양쪽에 다 표시
+      setCategory(foundCategory);
+      setLessons(lessonsData);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load data:', err);
+      setError('Failed to load data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDifficultyColor = (difficulty: number) => {
+    const mapped = mapDifficulty(difficulty);
+    switch (mapped) {
       case 'EASY':
         return '#90EE90';
       case 'MEDIUM':
@@ -33,18 +63,37 @@ export default function ItemListPage() {
     }
   };
 
-  const getDifficultyLabel = (difficulty: string) => {
-    switch (difficulty) {
-      case 'EASY':
-        return 'Easy';
-      case 'MEDIUM':
-        return 'Medium';
-      case 'HARD':
-        return 'Hard';
-      default:
-        return difficulty;
-    }
+  const getDifficultyLabel = (difficulty: number) => {
+    return mapDifficulty(difficulty);
   };
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+            Loading...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !category) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <Header />
+          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+            {error || 'Category not found.'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const levelName = level === 'word' ? 'Word' : 'Phrase';
 
   return (
     <div className="page">
@@ -57,25 +106,25 @@ export default function ItemListPage() {
 
         <section className="list-header">
           <div className="list-header-content">
-            <div className="list-header-emoji">{category.emoji}</div>
+            <div className="list-header-emoji">{category.iconEmoji}</div>
             <div>
               <h1 className="list-header-title">
                 {category.name} - {levelName} Learning
               </h1>
               <p className="list-header-subtitle">
-                {filteredLessons.length} lessons available
+                {lessons.length} lessons available
               </p>
             </div>
           </div>
         </section>
 
         <section className="lessons-grid">
-          {filteredLessons.length === 0 ? (
+          {lessons.length === 0 ? (
             <div className="no-lessons">
               <p>No lessons available yet.</p>
             </div>
           ) : (
-            filteredLessons.map((lesson) => (
+            lessons.map((lesson) => (
               <div key={lesson.id} className="lesson-card">
                 <div className="lesson-card-header">
                   <h3 className="lesson-card-title">{lesson.title}</h3>
@@ -86,7 +135,7 @@ export default function ItemListPage() {
                     {getDifficultyLabel(lesson.difficulty)}
                   </span>
                 </div>
-                <p className="lesson-card-description">{lesson.description}</p>
+                <p className="lesson-card-description">{lesson.signLanguage}</p>
                 <button
                   className="lesson-card-button"
                   onClick={() => navigate(`/lesson/${lesson.id}`)}
