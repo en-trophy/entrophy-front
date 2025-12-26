@@ -1,8 +1,8 @@
 import type { Category, Lesson } from '../types';
 
-// 개발 환경에서는 Vite 프록시를 사용 (vite.config.ts 참조)
-const BACKEND_API_URL = '';
-const AI_API_URL = 'https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net';
+// 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL || '';
+const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net';
 
 export interface LessonFeedbackRequest {
   target_word_id: number;
