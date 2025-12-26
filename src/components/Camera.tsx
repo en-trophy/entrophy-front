@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
-import { Holistic, Results, HAND_CONNECTIONS, POSE_CONNECTIONS } from '@mediapipe/holistic';
+import { Holistic, HAND_CONNECTIONS, POSE_CONNECTIONS } from '@mediapipe/holistic';
+import type { Results } from '@mediapipe/holistic';
 import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
-import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+import { drawConnectors } from '@mediapipe/drawing_utils';
 import { aiApi } from '../services/api';
 import type { Pose } from '../types';
 import './Camera.css';
