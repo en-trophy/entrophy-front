@@ -36,10 +36,13 @@ export default function ItemListPage() {
         return;
       }
 
-      // 임시: type 필터링 제거 (백엔드에 word/phrase 구분 없음)
-      // 모든 레슨을 word, phrase 양쪽에 다 표시
+      // Filter lessons by type (WORD or PHRASE)
+      const filteredLessons = lessonsData.filter(
+        (lesson) => lesson.type.toUpperCase() === level?.toUpperCase()
+      );
+
       setCategory(foundCategory);
-      setLessons(lessonsData);
+      setLessons(filteredLessons);
       setError(null);
     } catch (err) {
       console.error('Failed to load data:', err);

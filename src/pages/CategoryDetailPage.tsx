@@ -73,10 +73,9 @@ export default function CategoryDetailPage() {
     );
   }
 
-  // 임시: type 구분 없이 전체 레슨 수 표시
-  const totalCount = lessons.length;
-  const wordCount = totalCount;
-  const phraseCount = totalCount;
+  // Count lessons by type
+  const wordCount = lessons.filter((l) => l.type.toUpperCase() === 'WORD').length;
+  const phraseCount = lessons.filter((l) => l.type.toUpperCase() === 'PHRASE').length;
 
   return (
     <div className="page">
