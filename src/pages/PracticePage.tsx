@@ -49,7 +49,9 @@ export default function PracticePage() {
   };
 
   const handleSuccess = () => {
+    console.log('🎉 Success! Pausing timer');
     setShowSuccessModal(true);
+    setIsChecking(false); // 타이머 멈춤
   };
 
   const handleStart = () => {
