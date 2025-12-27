@@ -12,13 +12,6 @@ export default function ScoreBoard({ score, targetWord }: ScoreBoardProps) {
     return '#ff4444'; // 빨강
   };
 
-  const getScoreMessage = (score: number): string => {
-    if (score >= 90) return 'Perfect! 🎉';
-    if (score >= 80) return 'Good job! 👍';
-    if (score >= 60) return 'Almost there! 💪';
-    return 'Follow the guide slowly';
-  };
-
   return (
     <div className="scoreboard">
       <div className="scoreboard-word">
@@ -31,7 +24,6 @@ export default function ScoreBoard({ score, targetWord }: ScoreBoardProps) {
           {score}
           <span className="scoreboard-score-unit">pts</span>
         </div>
-        <div className="scoreboard-message">{getScoreMessage(score)}</div>
       </div>
 
       <div className="scoreboard-bar">

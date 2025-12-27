@@ -13,14 +13,24 @@ interface CameraProps {
   lessonId: string;
   onScoreUpdate?: (score: number) => void;
   onSuccess?: () => void;
+  onFeedback?: (feedback: string, score: number) => void;
+  isRunning?: boolean;
 }
 
-export default function Camera({ lessonId, onScoreUpdate, onSuccess }: CameraProps) {
+export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback, isRunning = true }: CameraProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const holisticRef = useRef<Holistic | null>(null);
-  const lastSentTime = useRef<number>(0);
+  const stillStartTime = useRef<number | null>(null);
+  const isRunningRef = useRef<boolean>(isRunning); // isRunning을 ref로 저장
   const [isWebcamReady, setIsWebcamReady] = useState(false);
+  const [countdown, setCountdown] = useState(5000);
+
+  // isRunning prop이 변경될 때 ref 업데이트
+  useEffect(() => {
+    console.log('🔍 Camera isRunning prop changed to:', isRunning);
+    isRunningRef.current = isRunning;
+  }, [isRunning]);
 
   // MediaPipe Holistic 초기화
   useEffect(() => {
@@ -53,17 +63,39 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess }: CameraPro
     }));
   };
 
-  // MediaPipe 결과 처리
+  // MediaPipe 결과 처리 (5초마다 자동 전송)
   const onHolisticResults = async (results: Results) => {
-    // AI 서버로 데이터 전송 (0.5초마다)
-    const currentTime = Date.now();
-    if (currentTime - lastSentTime.current >= 500) {
-      lastSentTime.current = currentTime;
-      await sendFeedback(results);
+    // Canvas에 skeleton 그리기 (항상 표시)
+    drawSkeletonOnCanvas(results);
+
+    console.log('⏱️ onHolisticResults called - isRunning:', isRunningRef.current, 'countdown:', countdown);
+
+    // isRunning이 false면 검사 중지
+    if (!isRunningRef.current) {
+      stillStartTime.current = null;
+      setCountdown(5000);
+      return;
     }
 
-    // Canvas에 skeleton 그리기
-    drawSkeletonOnCanvas(results);
+    const currentTime = Date.now();
+
+    // 처음 시작할 때
+    if (stillStartTime.current === null) {
+      stillStartTime.current = currentTime;
+      console.log('🎬 Timer started at:', currentTime);
+    }
+
+    const elapsed = currentTime - stillStartTime.current;
+    const remaining = Math.max(0, 5000 - elapsed);
+    setCountdown(remaining);
+
+    // 5초 경과하면 AI 서버로 전송
+    if (elapsed >= 5000) {
+      console.log('[AI] Sending to server...');
+      await sendFeedback(results);
+      // 전송 후 타이머 리셋
+      stillStartTime.current = null;
+    }
   };
 
   // AI 서버로 데이터를 보내는 함수
@@ -91,14 +123,20 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess }: CameraPro
       console.log('AI Server response:', data);
 
       // 서버에서 받은 score를 0~100으로 변환 (서버는 0~1 사이로 보냄)
+      const scorePercent = Math.round(data.score * 100);
       if (data.score !== undefined) {
-        onScoreUpdate?.(Math.round(data.score * 100));
+        onScoreUpdate?.(scorePercent);
       }
 
-      // 성공 판정
-      if (data.isCorrect) {
+      // 100점이거나 성공 판정이면 성공 모달 표시
+      if (scorePercent === 100 || data.isCorrect) {
         console.log('Success! Sign language is correct.');
         onSuccess?.();
+      } else {
+        // 100점 미만일 때만 피드백 모달 표시
+        if (data.feedback) {
+          onFeedback?.(data.feedback, scorePercent);
+        }
       }
     } catch (error) {
       console.error('Failed to send feedback to AI server:', error);
@@ -165,6 +203,21 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess }: CameraPro
         videoConstraints={{ width: 640, height: 480 }}
       />
       <canvas ref={canvasRef} className="camera-canvas" />
+
+      {/* 상태 표시 */}
+      {isWebcamReady && (
+        <div className={`camera-status ${isRunning ? '' : 'paused'}`}>
+          {isRunning ? 'Checking...' : 'Paused'}
+        </div>
+      )}
+
+      {/* 카운트다운 표시 */}
+      {isWebcamReady && isRunning && (
+        <div className="camera-countdown">
+          {countdown === 0 ? 'Sending...' : `Next check: ${(countdown / 1000).toFixed(1)}s`}
+        </div>
+      )}
+
       {!isWebcamReady && (
         <div className="camera-loading">Loading webcam...</div>
       )}

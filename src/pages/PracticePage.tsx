@@ -15,6 +15,12 @@ export default function PracticePage() {
   const [practiceTime, setPracticeTime] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isChecking, setIsChecking] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [currentFeedback, setCurrentFeedback] = useState<{
+    message: string;
+    score: number;
+  } | null>(null);
 
   useEffect(() => {
     loadLesson();
@@ -44,6 +50,25 @@ export default function PracticePage() {
 
   const handleSuccess = () => {
     setShowSuccessModal(true);
+  };
+
+  const handleStart = () => {
+    console.log('✅ Start Practice button clicked!');
+    setIsChecking(true);
+  };
+
+  const handleFeedback = (feedback: string, score: number) => {
+    console.log('📢 Feedback received, pausing timer');
+    setCurrentFeedback({ message: feedback, score });
+    setShowFeedbackModal(true);
+    setIsChecking(false);
+  };
+
+  const handleRetry = () => {
+    console.log('🔄 Try Again button clicked, restarting timer');
+    setShowFeedbackModal(false);
+    setCurrentFeedback(null);
+    setIsChecking(true);
   };
 
   const handleComplete = () => {
@@ -104,12 +129,25 @@ export default function PracticePage() {
 
         <ScoreBoard score={score} targetWord={lesson.title} />
 
-        <Camera
-          targetPose={null}
-          lessonId={lesson.id.toString()}
-          onScoreUpdate={setScore}
-          onSuccess={handleSuccess}
-        />
+        <div style={{ position: 'relative' }}>
+          <Camera
+            targetPose={null}
+            lessonId={lesson.id.toString()}
+            onScoreUpdate={setScore}
+            onSuccess={handleSuccess}
+            onFeedback={handleFeedback}
+            isRunning={isChecking}
+          />
+
+          {/* Start Button Overlay */}
+          {!isChecking && !showSuccessModal && !showFeedbackModal && (
+            <div className="practice-start-overlay">
+              <button className="practice-start-button" onClick={handleStart}>
+                Start Practice
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="practice-controls">
           {lesson.signLanguage && (
@@ -147,6 +185,21 @@ export default function PracticePage() {
             <p>You've successfully performed the sign language!</p>
             <button className="success-button" onClick={handleComplete}>
               Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && currentFeedback && (
+        <div className="feedback-modal-overlay">
+          <div className="feedback-modal">
+            <div className="feedback-icon">💡</div>
+            <h2>Feedback</h2>
+            <p className="feedback-score">Score: {currentFeedback.score}/100</p>
+            <p className="feedback-message">{currentFeedback.message}</p>
+            <button className="retry-button" onClick={handleRetry}>
+              Try Again
             </button>
           </div>
         </div>
