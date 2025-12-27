@@ -1,7 +1,11 @@
 import type { Category, Lesson } from '../types';
 
 // 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
-const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL || '';
+// 프로덕션 배포 시 환경 변수가 없으면 기본값 사용
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL ||
+  (import.meta.env.MODE === 'production'
+    ? 'https://equal-sign-backend-api-haejb5bdhnezc2c2.koreacentral-01.azurewebsites.net'
+    : '');
 const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'https://equal-sign-ai-fuf6dpbxbcfcdahq.koreacentral-01.azurewebsites.net';
 
 export interface LessonFeedbackRequest {
