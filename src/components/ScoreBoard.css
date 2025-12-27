@@ -66,3 +66,27 @@
   border-radius: 4px;
   transition: width 0.3s ease, background-color 0.3s ease;
 }
+
+.scoreboard-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  border-left: 3px solid rgba(255, 215, 0, 0.8);
+}
+
+.scoreboard-feedback-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.scoreboard-feedback-text {
+  font-size: 20px;
+  line-height: 1.5;
+  color: white;
+  opacity: 0.95;
+}

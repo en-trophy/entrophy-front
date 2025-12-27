@@ -3,9 +3,10 @@ import './ScoreBoard.css';
 interface ScoreBoardProps {
   score: number;
   targetWord: string;
+  feedback?: string;
 }
 
-export default function ScoreBoard({ score, targetWord }: ScoreBoardProps) {
+export default function ScoreBoard({ score, targetWord, feedback }: ScoreBoardProps) {
   const getScoreColor = (score: number): string => {
     if (score >= 80) return '#00d26a'; // 초록
     if (score >= 60) return '#ffb800'; // 노랑
@@ -25,6 +26,13 @@ export default function ScoreBoard({ score, targetWord }: ScoreBoardProps) {
           <span className="scoreboard-score-unit">pts</span>
         </div>
       </div>
+
+      {feedback && (
+        <div className="scoreboard-feedback">
+          <span className="scoreboard-feedback-icon">💡</span>
+          <span className="scoreboard-feedback-text">{feedback}</span>
+        </div>
+      )}
 
       <div className="scoreboard-bar">
         <div

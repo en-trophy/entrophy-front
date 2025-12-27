@@ -69,7 +69,6 @@ export default function PracticePage() {
   const handleRetry = () => {
     console.log('🔄 Try Again button clicked, restarting timer');
     setShowFeedbackModal(false);
-    setCurrentFeedback(null);
     setIsChecking(true);
   };
 
@@ -129,7 +128,7 @@ export default function PracticePage() {
           <div className="practice-timer">⏱️ {Math.floor(practiceTime / 60)}:{(practiceTime % 60).toString().padStart(2, '0')}</div>
         </div>
 
-        <ScoreBoard score={score} targetWord={lesson.title} />
+        <ScoreBoard score={score} targetWord={lesson.title} feedback={currentFeedback?.message} />
 
         <div style={{ position: 'relative' }}>
           <Camera
@@ -160,21 +159,6 @@ export default function PracticePage() {
           <button className="practice-complete-button" onClick={handleComplete}>
             Complete Learning
           </button>
-        </div>
-
-        <div className="practice-legend">
-          <div className="legend-item">
-            <span className="legend-color" style={{ background: '#00d26a' }} />
-            <span>Accurate</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ background: '#ffb800' }} />
-            <span>Moderate</span>
-          </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ background: '#ff4444' }} />
-            <span>Error</span>
-          </div>
         </div>
       </div>
 
