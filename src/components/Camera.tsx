@@ -128,15 +128,15 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
         onScoreUpdate?.(scorePercent);
       }
 
-      // 피드백 콜백 호출 (매번 표시)
-      if (data.feedback) {
-        onFeedback?.(data.feedback, scorePercent);
-      }
-
-      // 성공 판정
-      if (data.isCorrect) {
+      // 100점이거나 성공 판정이면 성공 모달 표시
+      if (scorePercent === 100 || data.isCorrect) {
         console.log('Success! Sign language is correct.');
         onSuccess?.();
+      } else {
+        // 100점 미만일 때만 피드백 모달 표시
+        if (data.feedback) {
+          onFeedback?.(data.feedback, scorePercent);
+        }
       }
     } catch (error) {
       console.error('Failed to send feedback to AI server:', error);
