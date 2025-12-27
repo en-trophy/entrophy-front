@@ -169,6 +169,112 @@
   box-shadow: 0 6px 20px rgba(22, 198, 12, 0.4);
 }
 
+/* Start Button Overlay */
+.practice-start-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.practice-start-button {
+  background: linear-gradient(135deg, #00d26a 0%, #00a854 100%);
+  color: white;
+  border: none;
+  padding: 20px 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 210, 106, 0.4);
+}
+
+.practice-start-button:hover {
+  background: linear-gradient(135deg, #00b85a 0%, #008f45 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(0, 210, 106, 0.5);
+}
+
+/* Feedback Modal */
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.feedback-modal {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.4s ease;
+}
+
+.feedback-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.feedback-modal h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #323130;
+  margin-bottom: 16px;
+}
+
+.feedback-score {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffb800;
+  margin: 20px 0;
+}
+
+.feedback-message {
+  font-size: 18px;
+  color: #333;
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+}
+
+.retry-button:hover {
+  background: linear-gradient(135deg, #005a9e 0%, #004578 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
