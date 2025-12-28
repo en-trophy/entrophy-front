@@ -98,6 +98,21 @@
   margin: 0;
 }
 
+.preview-image-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+.preview-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 400px;
+}
+
 .start-practice-button {
   background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
   color: white;
