@@ -100,9 +100,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     const ctx = captureCanvas.getContext('2d');
     if (!ctx) return null;
 
-    // 비디오 프레임을 canvas에 그리기 (미러링)
-    ctx.translate(captureCanvas.width, 0);
-    ctx.scale(-1, 1);
+    // 비디오 프레임을 canvas에 그리기 (거울 모드 제거 - AI 서버용)
     ctx.drawImage(video, 0, 0);
 
     // canvas를 Blob으로 변환
