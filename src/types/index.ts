@@ -120,3 +120,32 @@ export function getCategoryColor(code: string): string {
   console.log(`🎨 Auto color: "${code}" → hue ${hue} → ${color}`);
   return color;
 }
+
+// 인증 관련 타입
+// 회원가입 요청
+export interface SignupRequest {
+  loginId: string;
+  password: string;
+  name: string;
+}
+
+// 로그인 요청
+export interface LoginRequest {
+  loginId: string;
+  password: string;
+}
+
+// 로그인 응답
+export interface LoginResponse {
+  accessToken: string;
+  userId: number;
+  loginId: string;
+  name: string;
+}
+
+// 사용자 정보
+export interface User {
+  userId: number;
+  loginId: string;
+  name: string;
+}

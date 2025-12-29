@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { isAuthenticated } from '../utils/auth';
 import './SidebarNav.css';
 
 type NavItem = {
@@ -8,15 +9,23 @@ type NavItem = {
     icon: string;
 };
 
-const navItems: NavItem[] = [
-    { label: 'Learn', to: '/', icon: '🏠' },
-    { label: 'Alphabet', to: '/alphabet', icon: '🔤' },
-    { label: 'Profile', to: '/profile', icon: '👤' },
-    { label: 'Learning History', to: '/history', icon: '🕘' },
-];
-
 export default function SidebarNav() {
     const [collapsed, setCollapsed] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
+    // 인증 상태에 따른 네비게이션 아이템 구성
+    const authItems: NavItem[] = isLoggedIn
+        ? [{ label: 'Profile', to: '/profile', icon: '👤' }]
+        : [
+            { label: 'Login', to: '/login', icon: '🔑' },
+            { label: 'Sign Up', to: '/login?signup=true', icon: '✍️' },
+        ];
+
+    const mainItems: NavItem[] = [
+        { label: 'Learn', to: '/', icon: '🏠' },
+        { label: 'Alphabet', to: '/alphabet', icon: '🔤' },
+        { label: 'Learning History', to: '/history', icon: '🕘' },
+    ];
 
     useEffect(() => {
         const saved = localStorage.getItem('sidebarCollapsed');
@@ -26,6 +35,24 @@ export default function SidebarNav() {
     useEffect(() => {
         localStorage.setItem('sidebarCollapsed', String(collapsed));
     }, [collapsed]);
+
+    // 인증 상태 변경 감지 (로그인/로그아웃 시 사이드바 업데이트)
+    useEffect(() => {
+        const checkAuthStatus = () => {
+            setIsLoggedIn(isAuthenticated());
+        };
+
+        // storage 이벤트로 로그인/로그아웃 감지
+        window.addEventListener('storage', checkAuthStatus);
+
+        // 주기적으로 인증 상태 확인 (같은 탭에서의 변경 감지)
+        const interval = setInterval(checkAuthStatus, 1000);
+
+        return () => {
+            window.removeEventListener('storage', checkAuthStatus);
+            clearInterval(interval);
+        };
+    }, []);
 
     return (
         <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
@@ -39,11 +66,31 @@ export default function SidebarNav() {
                 >
                     =
                 </button>
-
             </div>
 
             <nav className="sidebar-menu">
-                {navItems.map((item) => (
+                {/* 인증 관련 버튼 (Profile 또는 Login/Sign Up) */}
+                {authItems.map((item) => (
+                    <NavLink
+                        key={item.to}
+                        to={item.to}
+                        className={({ isActive }) =>
+                            `sidebar-link ${isActive ? 'active' : ''}`
+                        }
+                        title={collapsed ? item.label : undefined}
+                    >
+                        <span className="sidebar-icon" aria-hidden>
+                            {item.icon}
+                        </span>
+                        {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                    </NavLink>
+                ))}
+
+                {/* 구분선 */}
+                <div className="sidebar-divider"></div>
+
+                {/* 메인 메뉴 (Learn, Alphabet, Learning History) */}
+                {mainItems.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}

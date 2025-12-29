@@ -52,17 +52,6 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     };
   }, [lessonId]);
 
-  // 데이터를 서버 형식에 맞게 변환하는 함수
-  const formatLandmarks = (landmarks: any) => {
-    if (!landmarks) return [];
-    return landmarks.map((lm: any) => ({
-      x: lm.x,
-      y: lm.y,
-      z: lm.z,
-      visibility: lm.visibility ?? 0,
-    }));
-  };
-
   // MediaPipe 결과 처리 (5초마다 자동 전송)
   const onHolisticResults = async (results: Results) => {
     // Canvas에 skeleton 그리기 (항상 표시)
@@ -98,7 +87,33 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     }
   };
 
-  // AI 서버로 데이터를 보내는 함수
+  // 웹캠 이미지를 캡처하는 함수
+  const captureWebcamImage = async (): Promise<Blob | null> => {
+    const video = webcamRef.current?.video;
+    if (!video) return null;
+
+    // 임시 canvas 생성
+    const captureCanvas = document.createElement('canvas');
+    captureCanvas.width = video.videoWidth;
+    captureCanvas.height = video.videoHeight;
+
+    const ctx = captureCanvas.getContext('2d');
+    if (!ctx) return null;
+
+    // 비디오 프레임을 canvas에 그리기 (미러링)
+    ctx.translate(captureCanvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0);
+
+    // canvas를 Blob으로 변환
+    return new Promise((resolve) => {
+      captureCanvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/jpeg', 0.95);
+    });
+  };
+
+  // AI 서버로 이미지를 보내는 함수
   const sendFeedback = async (results: Results) => {
     if (!lessonId) return;
 
@@ -108,18 +123,18 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       return;
     }
 
-    const payload = {
-      target_word_id: 0,
-      raw_landmarks: {
-        face_landmarks: formatLandmarks(results.faceLandmarks),
-        pose_landmarks: formatLandmarks(results.poseLandmarks),
-        left_hand_landmarks: formatLandmarks(results.leftHandLandmarks),
-        right_hand_landmarks: formatLandmarks(results.rightHandLandmarks),
-      }
-    };
-
     try {
-      const data = await aiApi.sendFeedback(numericLessonId, payload);
+      // 웹캠 이미지 캡처
+      const imageBlob = await captureWebcamImage();
+      if (!imageBlob) {
+        console.error('Failed to capture webcam image');
+        return;
+      }
+
+      console.log('📷 Captured image, size:', imageBlob.size, 'bytes');
+
+      // AI 서버로 이미지 전송
+      const data = await aiApi.sendFeedback(numericLessonId, imageBlob);
       console.log('AI Server response:', data);
 
       // 서버에서 받은 score를 0~100으로 변환 (서버는 0~1 사이로 보냄)

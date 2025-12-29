@@ -1,4 +1,4 @@
-import type { Category, Lesson } from '../types';
+import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse } from '../types';
 
 // 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
 // 프로덕션 배포 시 환경 변수가 없으면 기본값 사용
@@ -55,17 +55,53 @@ export const backendApi = {
   },
 };
 
+// Auth API calls
+export const authApi = {
+  // Sign up new user
+  async signup(request: SignupRequest): Promise<void> {
+    const response = await fetch(`${BACKEND_API_URL}/api/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Signup failed');
+    }
+  },
+
+  // Login user
+  async login(request: LoginRequest): Promise<LoginResponse> {
+    const response = await fetch(`${BACKEND_API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Login failed');
+    }
+
+    return response.json();
+  },
+};
+
 // AI API calls
 export const aiApi = {
-  // Send feedback to AI server
-  async sendFeedback(lessonId: number, request: LessonFeedbackRequest): Promise<LessonFeedbackResponse> {
-    const response = await fetch(`${AI_API_URL}/api/lessons/${lessonId}/feedback`, {
+  // Send feedback to AI server (이미지 전송)
+  async sendFeedback(lessonId: number, imageBlob: Blob): Promise<LessonFeedbackResponse> {
+    const formData = new FormData();
+    formData.append('file', imageBlob, 'webcam-capture.jpg');
+
+    const response = await fetch(`${AI_API_URL}/api/lessons/${lessonId}/feedback/image`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',
-        'Content-Type': 'application/json',
+        // Content-Type은 자동으로 multipart/form-data로 설정됨
       },
-      body: JSON.stringify(request),
+      body: formData,
     });
 
     if (!response.ok) {

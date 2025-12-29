@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
 import ItemListPage from './pages/ItemListPage';
@@ -12,6 +13,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
         <Route path="/category/:categoryId/:level" element={<ItemListPage />} />
         <Route path="/lesson/:lessonId" element={<LessonDetailPage />} />
