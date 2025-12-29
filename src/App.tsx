@@ -12,8 +12,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
         <Route path="/category/:categoryId/:level" element={<ItemListPage />} />
         <Route path="/lesson/:lessonId" element={<LessonDetailPage />} />

@@ -90,15 +90,18 @@ export const authApi = {
 
 // AI API calls
 export const aiApi = {
-  // Send feedback to AI server
-  async sendFeedback(lessonId: number, request: LessonFeedbackRequest): Promise<LessonFeedbackResponse> {
-    const response = await fetch(`${AI_API_URL}/api/lessons/${lessonId}/feedback`, {
+  // Send feedback to AI server (이미지 전송)
+  async sendFeedback(lessonId: number, imageBlob: Blob): Promise<LessonFeedbackResponse> {
+    const formData = new FormData();
+    formData.append('file', imageBlob, 'webcam-capture.jpg');
+
+    const response = await fetch(`${AI_API_URL}/api/lessons/${lessonId}/feedback/image`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',
-        'Content-Type': 'application/json',
+        // Content-Type은 자동으로 multipart/form-data로 설정됨
       },
-      body: JSON.stringify(request),
+      body: formData,
     });
 
     if (!response.ok) {

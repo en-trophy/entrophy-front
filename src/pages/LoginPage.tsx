@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from '../services/api';
 import { saveAuth } from '../utils/auth';
 import './LoginPage.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [isSignup, setIsSignup] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [isSignup, setIsSignup] = useState(searchParams.get('signup') === 'true');
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -21,7 +22,7 @@ export default function LoginPage() {
     try {
       const response = await authApi.login({ loginId, password });
       saveAuth(response);
-      navigate('/home');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

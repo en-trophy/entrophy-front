@@ -30,6 +30,36 @@
     gap: 10px;
 }
 
+.sidebar-home-link {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.92);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    transition: transform 0.06s ease, background 0.12s ease;
+    font-weight: 700;
+}
+
+.sidebar.collapsed .sidebar-home-link {
+    justify-content: center;
+    padding: 10px 8px;
+}
+
+.sidebar-home-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-home-link:active {
+    transform: scale(0.99);
+}
+
+.sidebar-home-link.active {
+    background: rgba(132, 209, 65, 0.18);
+    border: 1px solid rgba(132, 209, 65, 0.35);
+}
+
 .sidebar-toggle {
     width: 40px;
     height: 40px;
@@ -80,6 +110,12 @@
     gap: 8px;
     margin-top: 10px;
     flex: 1;
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 8px 0;
 }
 
 .sidebar-link {
