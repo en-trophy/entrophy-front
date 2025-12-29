@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import SidebarNav from '../components/SidebarNav';
 import { backendApi } from '../services/api';
 import type { Category } from '../types';
 import { getCategoryColor } from '../types';
-import Header from '../components/Header';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -13,14 +14,13 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadCategories();
+    void loadCategories();
   }, []);
 
   const loadCategories = async () => {
     try {
       setLoading(true);
       const data = await backendApi.getCategories();
-      console.log('📦 Categories from backend:', data);
       setCategories(data);
       setError(null);
     } catch (err) {
@@ -31,37 +31,25 @@ export default function HomePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="page">
-        <div className="page-container">
-          <Header />
-          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
-            Loading categories...
-          </div>
+  const content = (() => {
+    if (loading) {
+      return (
+        <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
+          Loading categories...
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (error) {
-    return (
-      <div className="page">
-        <div className="page-container">
-          <Header />
-          <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
-            {error}
-          </div>
+    if (error) {
+      return (
+        <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
+          {error}
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return (
-    <div className="page">
-      <div className="page-container">
-        <Header />
-
+    return (
+      <>
         <section className="hero-section">
           <h2 className="hero-title">What would you like to learn?</h2>
           <p className="hero-subtitle">Select a category to start learning sign language</p>
@@ -87,6 +75,21 @@ export default function HomePage() {
             AI Sign Language Tutor for Improving Deaf Education Accessibility
           </p>
         </footer>
+      </>
+    );
+  })();
+
+  return (
+    <div className="page">
+      <div className="page-layout">
+        <SidebarNav />
+
+        <main className="page-content">
+          <div className="page-container">
+            <Header />
+            {content}
+          </div>
+        </main>
       </div>
     </div>
   );

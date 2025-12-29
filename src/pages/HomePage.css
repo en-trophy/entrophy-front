@@ -1,13 +1,39 @@
 .page {
   min-height: 100vh;
+  width: 100%;
   background: linear-gradient(to bottom, #f3f2f1 0%, #e1dfdd 100%);
+  overflow-x: hidden;
+  /* 가로 스크롤 방지 */
 }
 
-.page-container {
+/* ✅ sidebar + content 레이아웃 (데스크탑 기본) */
+.page-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ✅ 컨텐츠 영역은 남은 폭을 다 씀 */
+.page-content {
+  flex: 1;
+  min-width: 0;
+  /* grid overflow 방지 */
+  overflow-x: hidden;
+  /* 가로 삐져나옴 방지 */
+}
+
+/* ✅ 중앙 정렬은 "content 영역" 기준으로만 */
+.page-content .page-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px 48px;
 }
+
+/* (선택) 기존 page-container 규칙이 다른 곳에 영향 줄까봐 최소화하고 싶으면 아래처럼만 유지
+.page-container {
+  padding: 0 24px 48px;
+}
+*/
 
 .hero-section {
   text-align: center;
@@ -83,6 +109,22 @@
   margin: 0;
 }
 
+/* ✅ 900px 이하에서는 사이드바 숨김 + 레이아웃 단일 컬럼 */
+@media (max-width: 900px) {
+  .page-layout {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .page-content .page-container {
+    padding: 0 16px 40px;
+  }
+}
+
+/* ✅ 768px 이하 폰에서 타이포/그리드 조정 */
 @media (max-width: 768px) {
   .hero-title {
     font-size: 28px;
