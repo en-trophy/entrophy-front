@@ -1,4 +1,4 @@
-import type { Category, Lesson } from '../types';
+import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse } from '../types';
 
 // 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
 // 프로덕션 배포 시 환경 변수가 없으면 기본값 사용
@@ -51,6 +51,39 @@ export const backendApi = {
   async getLessonsByCategory(categoryId: number): Promise<Lesson[]> {
     const response = await fetch(`${BACKEND_API_URL}/api/lessons/category/${categoryId}`);
     if (!response.ok) throw new Error('Failed to fetch lessons by category');
+    return response.json();
+  },
+};
+
+// Auth API calls
+export const authApi = {
+  // Sign up new user
+  async signup(request: SignupRequest): Promise<void> {
+    const response = await fetch(`${BACKEND_API_URL}/api/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Signup failed');
+    }
+  },
+
+  // Login user
+  async login(request: LoginRequest): Promise<LoginResponse> {
+    const response = await fetch(`${BACKEND_API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Login failed');
+    }
+
     return response.json();
   },
 };
