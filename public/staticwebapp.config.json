@@ -10,9 +10,15 @@
     "rewrite": "/index.html"
   },
   "mimeTypes": {
-    ".js": "application/javascript",
-    ".mjs": "application/javascript",
-    ".json": "application/json"
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".jsx": "text/javascript",
+    ".ts": "text/typescript",
+    ".tsx": "text/typescript",
+    ".json": "application/json",
+    ".css": "text/css",
+    ".html": "text/html",
+    ".wasm": "application/wasm"
   },
   "globalHeaders": {
     "Access-Control-Allow-Origin": "*",
