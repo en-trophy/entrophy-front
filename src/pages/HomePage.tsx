@@ -10,6 +10,7 @@ import './HomePage.css';
 export default function HomePage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [lessonCounts, setLessonCounts] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,8 +21,19 @@ export default function HomePage() {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const data = await backendApi.getCategories();
-      setCategories(data);
+      const [categoriesData, lessonsData] = await Promise.all([
+        backendApi.getCategories(),
+        backendApi.getLessons(),
+      ]);
+
+      // 카테고리별 레슨 개수 계산
+      const counts = new Map<number, number>();
+      lessonsData.forEach((lesson) => {
+        counts.set(lesson.categoryId, (counts.get(lesson.categoryId) || 0) + 1);
+      });
+
+      setCategories(categoriesData);
+      setLessonCounts(counts);
       setError(null);
     } catch (err) {
       console.error('Failed to load categories:', err);
@@ -56,18 +68,27 @@ export default function HomePage() {
         </section>
 
         <section className="categories-grid">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              className="category-card"
-              style={{ backgroundColor: getCategoryColor(category.code) }}
-              onClick={() => navigate(`/category/${category.id}`)}
-            >
-              <div className="category-emoji">{category.iconEmoji}</div>
-              <h3 className="category-name">{category.name}</h3>
-              <p className="category-description">{category.description}</p>
-            </button>
-          ))}
+          {categories.map((category) => {
+            const lessonCount = lessonCounts.get(category.id) || 0;
+            const hasLessons = lessonCount > 0;
+
+            return (
+              <button
+                key={category.id}
+                className={`category-card ${!hasLessons ? 'disabled' : ''}`}
+                style={{ backgroundColor: getCategoryColor(category.code) }}
+                onClick={() => hasLessons && navigate(`/category/${category.id}`)}
+                disabled={!hasLessons}
+              >
+                <div className="category-emoji">{category.iconEmoji}</div>
+                <h3 className="category-name">{category.name}</h3>
+                <p className="category-description">{category.description}</p>
+                {!hasLessons && (
+                  <p className="category-no-data">No lessons available yet</p>
+                )}
+              </button>
+            );
+          })}
         </section>
 
         <footer className="home-footer">
