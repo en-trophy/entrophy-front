@@ -1,8 +1,27 @@
+.back-button {
+  background: white;
+  border: 2px solid #0078d4;
+  color: #0078d4;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 48px 24px 48px;
+}
+
+.back-button:hover {
+  background: #0078d4;
+  color: white;
+  transform: translateX(-4px);
+}
+
 .list-header {
   background: white;
   border-radius: 16px;
   padding: 32px;
-  margin-bottom: 32px;
+  margin: 0 48px 32px 48px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -35,7 +54,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
-  margin-bottom: 48px;
+  margin: 0 48px 48px 48px;
 }
 
 .lesson-card {
@@ -113,6 +132,14 @@
 }
 
 @media (max-width: 768px) {
+  .back-button {
+    margin: 0 24px 24px 24px;
+  }
+
+  .list-header {
+    margin: 0 24px 32px 24px;
+  }
+
   .list-header-content {
     flex-direction: column;
     text-align: center;
@@ -124,5 +151,6 @@
 
   .lessons-grid {
     grid-template-columns: 1fr;
+    margin: 0 24px 48px 24px;
   }
 }
