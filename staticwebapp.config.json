@@ -1,20 +1,11 @@
 {
-  "routes": [
-    {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 200
-    }
-  ],
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "/*.js", "/*.css", "/*.json", "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.wasm"]
   },
   "mimeTypes": {
     ".js": "text/javascript",
     ".mjs": "text/javascript",
-    ".jsx": "text/javascript",
-    ".ts": "text/typescript",
-    ".tsx": "text/typescript",
     ".json": "application/json",
     ".css": "text/css",
     ".html": "text/html",
