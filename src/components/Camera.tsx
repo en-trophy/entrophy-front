@@ -81,7 +81,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     // 5초 경과하면 AI 서버로 전송
     if (elapsed >= 5000) {
       console.log('[AI] Sending to server...');
-      await sendFeedback(results);
+      await sendFeedback();
       // 전송 후 타이머 리셋
       stillStartTime.current = null;
     }
@@ -112,7 +112,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   };
 
   // AI 서버로 이미지를 보내는 함수
-  const sendFeedback = async (results: Results) => {
+  const sendFeedback = async () => {
     if (!lessonId) return;
 
     const numericLessonId = parseInt(lessonId, 10);
