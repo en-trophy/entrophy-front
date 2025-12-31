@@ -394,62 +394,6 @@ export default function SimulationPage() {
                 <p>{simulation.situation}</p>
               </div>
 
-              {/* Situation Image */}
-              <div className="simulation-image">
-                <img src={simulation.image_url} alt="Situation" />
-              </div>
-
-              {/* Webcam */}
-              <div className="simulation-webcam">
-                <div className="webcam-container">
-                  <Webcam
-                    ref={webcamRef}
-                    audio={false}
-                    mirrored={true}
-                    onUserMedia={onWebcamReady}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                  <canvas
-                    ref={canvasRef}
-                    className="skeleton-canvas"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                    }}
-                  />
-
-                  {/* Status indicator (left top) */}
-                  {isWebcamReady && isWaitingForUser && (
-                    <div className={`camera-status ${isChecking ? '' : 'paused'}`}>
-                      {isChecking ? 'Checking...' : 'Paused'}
-                    </div>
-                  )}
-
-                  {/* Countdown display (right top) */}
-                  {isWebcamReady && isChecking && (
-                    <div className="camera-countdown">
-                      {countdown === 0 ? 'Sending...' : `Next check: ${(countdown / 1000).toFixed(1)}s`}
-                    </div>
-                  )}
-
-                  {/* Overlay for Perform Sign button (User turn only) */}
-                  {isWaitingForUser && !isChecking && !isAnalyzing && !showSuccessModal && !showFeedbackModal && (
-                    <div className="simulation-start-overlay">
-                      <button
-                        onClick={handleStart}
-                        className="simulation-start-button"
-                        disabled={!isWebcamReady}
-                      >
-                        Perform Sign
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Dialogue */}
               <div className="simulation-dialogue">
                 {currentDialogue.speaker === 'AI' ? (
@@ -468,6 +412,73 @@ export default function SimulationPage() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Image and Webcam Container (가로 배치) */}
+              <div className="simulation-media-container">
+                {/* Situation Image */}
+                <div className="simulation-image">
+                  <img src={simulation.image_url} alt="Situation" />
+                </div>
+
+                {/* Webcam */}
+                <div className="simulation-webcam">
+                  <div className="webcam-container">
+                    <Webcam
+                      ref={webcamRef}
+                      audio={false}
+                      mirrored={true}
+                      onUserMedia={onWebcamReady}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <canvas
+                      ref={canvasRef}
+                      className="skeleton-canvas"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+
+                    {/* Status indicator (left top) */}
+                    {isWebcamReady && isWaitingForUser && (
+                      <div className={`camera-status ${isChecking ? '' : 'paused'}`}>
+                        {isChecking ? 'Checking...' : 'Paused'}
+                      </div>
+                    )}
+
+                    {/* Countdown display (right top) */}
+                    {isWebcamReady && isChecking && (
+                      <div className="camera-countdown">
+                        {countdown === 0 ? 'Sending...' : `Next check: ${(countdown / 1000).toFixed(1)}s`}
+                      </div>
+                    )}
+
+                    {/* Overlay for Perform Sign button (User turn only) */}
+                    {isWaitingForUser && !isChecking && !isAnalyzing && !showSuccessModal && !showFeedbackModal && (
+                      <div className="simulation-start-overlay">
+                        <button
+                          onClick={handleStart}
+                          className="simulation-start-button"
+                          disabled={!isWebcamReady}
+                        >
+                          Perform Sign
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Analyzing Overlay */}
+                    {isAnalyzing && (
+                      <div className="simulation-analyzing-overlay">
+                        <div className="analyzing-spinner"></div>
+                        <div className="analyzing-text">Analyzing...</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Progress */}
