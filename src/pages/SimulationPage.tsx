@@ -30,6 +30,7 @@ export default function SimulationPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [countdown, setCountdown] = useState(5000);
+  const [isAnalyzing, setIsAnalyzing] = useState(false); // AI 피드백 기다리는 중
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState<{
@@ -232,7 +233,8 @@ export default function SimulationPage() {
       return;
     }
 
-    // isChecking은 이미 onHolisticResults에서 false로 설정됨
+    // AI 분석 시작
+    setIsAnalyzing(true);
 
     try {
       console.log('📷 Capturing image...');
@@ -241,6 +243,7 @@ export default function SimulationPage() {
         console.log('❌ Failed to capture image');
         setCurrentFeedback({ message: 'Failed to capture image', score: 0 });
         setShowFeedbackModal(true);
+        setIsAnalyzing(false);
         return;
       }
 
@@ -252,16 +255,19 @@ export default function SimulationPage() {
         console.log('🎉 Correct! Showing success modal');
         // 성공 모달 표시
         setShowSuccessModal(true);
+        setIsAnalyzing(false);
       } else {
         console.log('💡 Incorrect. Showing feedback modal');
         // 피드백 모달 표시
         setCurrentFeedback({ message: feedback.feedback, score: feedback.score });
         setShowFeedbackModal(true);
+        setIsAnalyzing(false);
       }
     } catch (err) {
       console.error('❌ Failed to get feedback:', err);
       setCurrentFeedback({ message: 'Failed to analyze. Please try again.', score: 0 });
       setShowFeedbackModal(true);
+      setIsAnalyzing(false);
     }
   };
 
@@ -420,7 +426,7 @@ export default function SimulationPage() {
                   )}
 
                   {/* Overlay for Perform Sign button (User turn only) */}
-                  {isWaitingForUser && !isChecking && !showSuccessModal && !showFeedbackModal && (
+                  {isWaitingForUser && !isChecking && !isAnalyzing && !showSuccessModal && !showFeedbackModal && (
                     <div className="simulation-start-overlay">
                       <button
                         onClick={handleStart}
