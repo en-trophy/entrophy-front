@@ -122,7 +122,7 @@ export default function LessonDetailPage() {
             </div>
 
             <button className="start-practice-button" onClick={handleStartPractice}>
-              Start Learning 🚀
+              Start Learning
             </button>
           </div>
         </section>
