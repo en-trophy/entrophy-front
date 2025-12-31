@@ -15,9 +15,10 @@ interface CameraProps {
   onSuccess?: () => void;
   onFeedback?: (feedback: string, score: number) => void;
   isRunning?: boolean;
+  onAnalyzingChange?: (isAnalyzing: boolean) => void;
 }
 
-export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback, isRunning = true }: CameraProps) {
+export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback, isRunning = true, onAnalyzingChange }: CameraProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const holisticRef = useRef<Holistic | null>(null);
@@ -25,12 +26,18 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   const isRunningRef = useRef<boolean>(isRunning); // isRunning을 ref로 저장
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [countdown, setCountdown] = useState(5000);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // isRunning prop이 변경될 때 ref 업데이트
   useEffect(() => {
     console.log('🔍 Camera isRunning prop changed to:', isRunning);
     isRunningRef.current = isRunning;
   }, [isRunning]);
+
+  // isAnalyzing이 변경될 때 부모 컴포넌트에 알림
+  useEffect(() => {
+    onAnalyzingChange?.(isAnalyzing);
+  }, [isAnalyzing, onAnalyzingChange]);
 
   // MediaPipe Holistic 초기화
   useEffect(() => {
@@ -81,9 +88,12 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     // 5초 경과하면 AI 서버로 전송
     if (elapsed >= 5000) {
       console.log('[AI] Sending to server...');
-      await sendFeedback();
-      // 전송 후 타이머 리셋
+      // 타이머 멈춤 & analyzing 시작
       stillStartTime.current = null;
+      isRunningRef.current = false; // 타이머 정지
+      setIsAnalyzing(true);
+
+      await sendFeedback();
     }
   };
 
@@ -145,14 +155,17 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       if (scorePercent === 100 || data.isCorrect) {
         console.log('Success! Sign language is correct.');
         onSuccess?.();
+        setIsAnalyzing(false); // 성공 시 analyzing 종료
       } else {
         // 100점 미만일 때만 피드백 모달 표시
         if (data.feedback) {
           onFeedback?.(data.feedback, scorePercent);
+          setIsAnalyzing(false); // 피드백 시 analyzing 종료
         }
       }
     } catch (error) {
       console.error('Failed to send feedback to AI server:', error);
+      setIsAnalyzing(false); // 에러 시에도 analyzing 종료
     }
   };
 
@@ -225,9 +238,17 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       )}
 
       {/* 카운트다운 표시 */}
-      {isWebcamReady && isRunning && (
+      {isWebcamReady && isRunning && !isAnalyzing && (
         <div className="camera-countdown">
-          {countdown === 0 ? 'Sending...' : `Next check: ${(countdown / 1000).toFixed(1)}s`}
+          Next check: {(countdown / 1000).toFixed(1)}s
+        </div>
+      )}
+
+      {/* Analyzing Overlay */}
+      {isAnalyzing && (
+        <div className="camera-analyzing-overlay">
+          <div className="analyzing-spinner"></div>
+          <div className="analyzing-text">Analyzing...</div>
         </div>
       )}
 

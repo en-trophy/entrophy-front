@@ -16,6 +16,7 @@ export default function PracticePage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isChecking, setIsChecking] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState<{
     message: string;
@@ -27,12 +28,15 @@ export default function PracticePage() {
   }, [lessonId]);
 
   useEffect(() => {
+    // isAnalyzing이 true이거나 isChecking이 false면 타이머 정지
+    if (isAnalyzing || !isChecking) return;
+
     const timer = setInterval(() => {
       setPracticeTime((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [isAnalyzing, isChecking]);
 
   const loadLesson = async () => {
     if (!lessonId) return;
@@ -138,6 +142,7 @@ export default function PracticePage() {
             onSuccess={handleSuccess}
             onFeedback={handleFeedback}
             isRunning={isChecking}
+            onAnalyzingChange={setIsAnalyzing}
           />
 
           {/* Start Button Overlay */}

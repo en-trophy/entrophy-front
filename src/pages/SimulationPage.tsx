@@ -510,7 +510,7 @@ export default function SimulationPage() {
           <div className="feedback-modal">
             <div className="feedback-icon">💡</div>
             <h2>Feedback</h2>
-            <p className="feedback-score">Score: {currentFeedback.score}/100</p>
+            <p className="feedback-score">Score: {Math.round(currentFeedback.score)}/100</p>
             <p className="feedback-message">{currentFeedback.message}</p>
             <button className="retry-button" onClick={handleRetry}>
               Try Again
