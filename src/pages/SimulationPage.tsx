@@ -268,8 +268,8 @@ export default function SimulationPage() {
         setIsAnalyzing(false);
       } else {
         console.log('💡 Incorrect. Showing feedback modal');
-        // 피드백 모달 표시
-        setCurrentFeedback({ message: feedback.feedback, score: feedback.score });
+        // 피드백 모달 표시 (점수 * 100)
+        setCurrentFeedback({ message: feedback.feedback, score: feedback.score * 100 });
         setShowFeedbackModal(true);
         setIsAnalyzing(false);
       }

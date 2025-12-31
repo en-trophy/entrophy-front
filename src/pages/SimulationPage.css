@@ -78,6 +78,8 @@
 
 .simulation-image img {
   width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   border-radius: 12px;
   display: block;
 }
