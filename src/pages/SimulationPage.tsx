@@ -20,6 +20,7 @@ export default function SimulationPage() {
   const isCheckingRef = useRef<boolean>(false); // isChecking을 ref로 저장
   const simulationRef = useRef<SimulationResponse | null>(null); // simulation을 ref로 저장
   const currentDialogueIndexRef = useRef<number>(0); // currentDialogueIndex를 ref로 저장
+  const hasLoadedRef = useRef<boolean>(false); // 시뮬레이션 로드 여부 체크
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,16 +57,25 @@ export default function SimulationPage() {
 
   // Load simulation data
   useEffect(() => {
-    void loadSimulation();
+    console.log('🎬 useEffect - Loading simulation...');
+    // StrictMode로 인한 중복 호출 방지
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      void loadSimulation();
+    } else {
+      console.log('⏭️ Already loaded, skipping...');
+    }
   }, []);
 
   const loadSimulation = async () => {
     try {
+      console.log('📡 loadSimulation called - Fetching from API...');
       setLoading(true);
       // TODO: 나중에 백엔드에서 오늘 배운 lesson_ids를 가져오기
       // 지금은 테스트용으로 하드코딩
       const testLessonIds = [1, 2];
       const data = await aiApi.createSimulation({ lesson_ids: testLessonIds });
+      console.log('✅ Simulation received:', data);
       setSimulation(data);
       setError(null);
 
