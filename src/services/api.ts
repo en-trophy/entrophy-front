@@ -1,4 +1,4 @@
-import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse } from '../types';
+import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse, SimulationRequest, SimulationResponse } from '../types';
 
 // 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
 // 프로덕션 배포 시 환경 변수가 없으면 기본값 사용
@@ -106,6 +106,24 @@ export const aiApi = {
 
     if (!response.ok) {
       throw new Error(`AI server error: ${response.status}`);
+    }
+
+    return response.json();
+  },
+
+  // Create simulation scenario
+  async createSimulation(request: SimulationRequest): Promise<SimulationResponse> {
+    const response = await fetch(`${AI_API_URL}/api/simulation`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create simulation: ${response.status}`);
     }
 
     return response.json();

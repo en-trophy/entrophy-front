@@ -1,0 +1,453 @@
+.simulation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.simulation-loading,
+.simulation-error {
+  text-align: center;
+  padding: 64px 32px;
+}
+
+.simulation-error p {
+  color: #d13438;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.simulation-completed {
+  text-align: center;
+  padding: 64px 32px;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.simulation-completed h2 {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0078d4;
+  margin: 0 0 16px 0;
+}
+
+.simulation-completed p {
+  font-size: 20px;
+  color: #605e5c;
+  margin: 0 0 32px 0;
+}
+
+/* Situation */
+.simulation-situation {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.simulation-situation h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0078d4;
+  margin: 0 0 12px 0;
+}
+
+.simulation-situation p {
+  font-size: 16px;
+  color: #323130;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Situation Image */
+.simulation-image {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.simulation-image img {
+  width: 100%;
+  border-radius: 12px;
+  display: block;
+}
+
+/* Webcam */
+.simulation-webcam {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.webcam-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.skeleton-canvas {
+  pointer-events: none;
+}
+
+/* Perform Sign Overlay */
+.simulation-start-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.simulation-start-button {
+  background: linear-gradient(135deg, #00d26a 0%, #00a854 100%);
+  color: white;
+  border: none;
+  padding: 20px 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 210, 106, 0.4);
+}
+
+.simulation-start-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00b85a 0%, #008f45 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(0, 210, 106, 0.5);
+}
+
+.simulation-start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Status and Countdown (like Camera.css) */
+.camera-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 200, 0, 0.8);
+  color: white;
+  padding: 16px 28px;
+  border-radius: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.camera-status.paused {
+  background: rgba(255, 180, 0, 0.8);
+}
+
+.camera-countdown {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 16px 28px;
+  border-radius: 30px;
+  font-size: 24px;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* Dialogue */
+.simulation-dialogue {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-height: 150px;
+}
+
+.dialogue-ai,
+.dialogue-user {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.speech-bubble {
+  padding: 16px 20px;
+  border-radius: 20px;
+  max-width: 80%;
+}
+
+.speech-bubble p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ai-bubble {
+  background: linear-gradient(135deg, #e1f5ff 0%, #cce7ff 100%);
+  border: 2px solid #0078d4;
+  align-self: flex-start;
+}
+
+.user-bubble {
+  background: linear-gradient(135deg, #fff4e1 0%, #ffe7cc 100%);
+  border: 2px solid #ff8c00;
+  align-self: flex-end;
+}
+
+
+/* Progress */
+.simulation-progress {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #605e5c;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Button */
+.button-primary {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+}
+
+.button-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 120, 212, 0.4);
+}
+
+.button-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success Modal */
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 64px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+  max-width: 500px;
+  width: 90%;
+}
+
+.success-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: bounce 0.6s ease;
+}
+
+.success-modal h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #16c60c;
+  margin-bottom: 16px;
+}
+
+.success-modal p {
+  font-size: 18px;
+  color: #605e5c;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.success-button {
+  background: linear-gradient(135deg, #16c60c 0%, #107c10 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(22, 198, 12, 0.3);
+}
+
+.success-button:hover {
+  background: linear-gradient(135deg, #107c10 0%, #0d5f0d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(22, 198, 12, 0.4);
+}
+
+/* Feedback Modal */
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.feedback-modal {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.4s ease;
+}
+
+.feedback-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.feedback-modal h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #323130;
+  margin-bottom: 16px;
+}
+
+.feedback-score {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffb800;
+  margin: 20px 0;
+}
+
+.feedback-message {
+  font-size: 20px;
+  color: #333;
+  margin: 20px 0;
+  line-height: 1.6;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+}
+
+.retry-button:hover {
+  background: linear-gradient(135deg, #005a9e 0%, #004578 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .simulation-container {
+    padding: 16px;
+  }
+
+  .simulation-situation h2 {
+    font-size: 20px;
+  }
+
+  .simulation-situation p {
+    font-size: 14px;
+  }
+
+  .speech-bubble {
+    max-width: 90%;
+  }
+
+  .simulation-completed h2 {
+    font-size: 32px;
+  }
+
+  .simulation-completed p {
+    font-size: 16px;
+  }
+
+  .success-modal {
+    padding: 32px 24px;
+  }
+
+  .success-modal h2 {
+    font-size: 28px;
+  }
+
+  .success-icon {
+    font-size: 64px;
+  }
+}

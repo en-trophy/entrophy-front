@@ -23,6 +23,7 @@ export default function SidebarNav() {
 
     const mainItems: NavItem[] = [
         { label: 'Learn', to: '/', icon: '🏠' },
+        { label: 'Practice Today', to: '/simulation', icon: '🎯' },
         { label: 'Alphabet', to: '/alphabet', icon: '🔤' },
         { label: 'Learning History', to: '/history', icon: '🕘' },
     ];
