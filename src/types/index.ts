@@ -149,3 +149,23 @@ export interface User {
   loginId: string;
   name: string;
 }
+
+// 시뮬레이션 관련 타입
+// 시뮬레이션 요청
+export interface SimulationRequest {
+  lesson_ids: number[];
+}
+
+// 대화 라인
+export interface DialogueLine {
+  speaker: 'AI' | 'User';
+  text: string;
+  target_lesson_id: number | null;
+}
+
+// 시뮬레이션 응답
+export interface SimulationResponse {
+  situation: string;
+  image_url: string;
+  dialogue: DialogueLine[];
+}

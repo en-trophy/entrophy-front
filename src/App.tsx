@@ -6,6 +6,7 @@ import ItemListPage from './pages/ItemListPage';
 import LessonDetailPage from './pages/LessonDetailPage';
 import PracticePage from './pages/PracticePage';
 import ResultPage from './pages/ResultPage';
+import SimulationPage from './pages/SimulationPage';
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/simulation" element={<SimulationPage />} />
         <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
         <Route path="/category/:categoryId/:level" element={<ItemListPage />} />
         <Route path="/lesson/:lessonId" element={<LessonDetailPage />} />
