@@ -46,7 +46,6 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [countdown, setCountdown] = useState(5000);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [capturedFrames, setCapturedFrames] = useState<Blob[]>([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [totalFrames, setTotalFrames] = useState(1);
   const [showAnalyzingOverlay, setShowAnalyzingOverlay] = useState(true);
@@ -219,10 +218,13 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
 
     try {
       // 단일 프레임 또는 멀티 프레임 처리
-      const imagesToSend = frames || [await captureWebcamImage()];
+      const rawImages = frames || [await captureWebcamImage()];
+
+      // null 필터링하여 Blob[] 타입 보장
+      const imagesToSend = rawImages.filter((blob): blob is Blob => blob !== null);
 
       // 모든 프레임 유효성 검사
-      if (imagesToSend.some(blob => !blob)) {
+      if (imagesToSend.length === 0 || imagesToSend.length !== rawImages.length) {
         console.error('Failed to capture one or more images');
         setIsAnalyzing(false);
         return;
