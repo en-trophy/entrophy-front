@@ -49,6 +49,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   const [capturedFrames, setCapturedFrames] = useState<Blob[]>([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [totalFrames, setTotalFrames] = useState(1);
+  const [showAnalyzingOverlay, setShowAnalyzingOverlay] = useState(true);
 
   // isRunning prop이 변경될 때 ref 업데이트
   useEffect(() => {
@@ -159,17 +160,24 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     const { frameCount, intervalMs } = config;
 
     setTotalFrames(frameCount);
+    setShowAnalyzingOverlay(false); // 초기에는 overlay 숨김
+
+    const FLASH_DURATION_MS = 150; // Overlay 표시 시간
 
     console.log(`[Multi-Frame] Starting capture: ${frameCount} frames, ${intervalMs}ms interval`);
 
     for (let i = 0; i < frameCount; i++) {
       setCurrentFrame(i + 1);
-      console.log(`[Multi-Frame] Capturing frame ${i + 1}/${frameCount}`);
 
-      // 현재 프레임 캡처
+      // Overlay 표시 ("Capturing frame X/Y...")
+      setShowAnalyzingOverlay(true);
+      await new Promise(resolve => setTimeout(resolve, FLASH_DURATION_MS));
+
+      // 프레임 캡처
       const frameBlob = await captureWebcamImage();
       if (!frameBlob) {
         console.error(`[Multi-Frame] Failed to capture frame ${i + 1}`);
+        setShowAnalyzingOverlay(false);
         setIsAnalyzing(false);
         onFeedback?.(`Failed to capture frame ${i + 1}. Please check your camera and try again.`, 0);
         return;
@@ -178,14 +186,22 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       frames.push(frameBlob);
       console.log(`[Multi-Frame] Frame ${i + 1} captured, size: ${frameBlob.size} bytes`);
 
+      // Overlay 숨김 (웹캠 화면 보임)
+      setShowAnalyzingOverlay(false);
+
       // 다음 프레임까지 대기 (마지막 프레임 제외)
       if (i < frameCount - 1) {
-        await new Promise(resolve => setTimeout(resolve, intervalMs));
+        const remainingInterval = intervalMs - FLASH_DURATION_MS;
+        await new Promise(resolve => setTimeout(resolve, remainingInterval));
       }
     }
 
     setCapturedFrames(frames);
     console.log(`[Multi-Frame] All ${frameCount} frames captured, sending to API...`);
+
+    // 모든 프레임 캡처 완료 - Analyzing 표시
+    setShowAnalyzingOverlay(true);
+    setCurrentFrame(0); // currentFrame을 0으로 설정하여 "Analyzing..." 텍스트 표시
 
     // 모든 프레임을 API로 전송
     await sendFeedback(frames);
@@ -244,6 +260,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       setCapturedFrames([]);
       setCurrentFrame(0);
       setTotalFrames(1);
+      setShowAnalyzingOverlay(true); // 다음 세션을 위해 초기값으로 리셋
     }
   };
 
@@ -323,7 +340,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       )}
 
       {/* Analyzing Overlay */}
-      {isAnalyzing && (
+      {isAnalyzing && showAnalyzingOverlay && (
         <div className="camera-analyzing-overlay">
           <div className="analyzing-spinner"></div>
           <div className="analyzing-text">
