@@ -90,12 +90,29 @@ export const authApi = {
 
 // AI API calls
 export const aiApi = {
-  // Send feedback to AI server (이미지 전송)
-  async sendFeedback(lessonId: number, imageBlob: Blob): Promise<LessonFeedbackResponse> {
+  // Send feedback to AI server (single or multiple images)
+  async sendFeedback(lessonId: number, images: Blob | Blob[]): Promise<LessonFeedbackResponse> {
     const formData = new FormData();
-    formData.append('file', imageBlob, 'webcam-capture.jpg');
 
-    const response = await fetch(`${AI_API_URL}/api/lessons/${lessonId}/feedback/image`, {
+    // 배열로 정규화
+    const imageArray = Array.isArray(images) ? images : [images];
+
+    // 단일 프레임: /image 엔드포인트, 멀티 프레임: /images 엔드포인트
+    const endpoint = imageArray.length === 1
+      ? `/api/lessons/${lessonId}/feedback/image`
+      : `/api/lessons/${lessonId}/feedback/images`;
+
+    if (imageArray.length === 1) {
+      // 단일 프레임
+      formData.append('file', imageArray[0], 'webcam-capture.jpg');
+    } else {
+      // 멀티 프레임 - 'files' 필드로 여러 개 append
+      imageArray.forEach((imageBlob, index) => {
+        formData.append('files', imageBlob, `webcam-capture-frame${index + 1}.jpg`);
+      });
+    }
+
+    const response = await fetch(`${AI_API_URL}${endpoint}`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',

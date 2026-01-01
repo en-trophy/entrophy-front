@@ -8,6 +8,25 @@ import { aiApi } from '../services/api';
 import type { Pose } from '../types';
 import './Camera.css';
 
+interface FrameCaptureConfig {
+  frameCount: number;      // 캡처할 프레임 수
+  intervalMs: number;      // 프레임 간 간격 (밀리초)
+}
+
+// 하드코딩된 설정 (향후 백엔드에서 받아올 예정)
+const LESSON_FRAME_CONFIG: Record<number, FrameCaptureConfig> = {
+  4: { frameCount: 2, intervalMs: 1000 }, // "thank you" - 2프레임, 1초 간격
+};
+
+const DEFAULT_FRAME_CONFIG: FrameCaptureConfig = {
+  frameCount: 1,
+  intervalMs: 0,
+};
+
+const getFrameConfig = (lessonId: number): FrameCaptureConfig => {
+  return LESSON_FRAME_CONFIG[lessonId] || DEFAULT_FRAME_CONFIG;
+};
+
 interface CameraProps {
   targetPose: Pose | null;
   lessonId: string;
@@ -27,6 +46,10 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [countdown, setCountdown] = useState(5000);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [capturedFrames, setCapturedFrames] = useState<Blob[]>([]);
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [totalFrames, setTotalFrames] = useState(1);
+  const [showAnalyzingOverlay, setShowAnalyzingOverlay] = useState(true);
 
   // isRunning prop이 변경될 때 ref 업데이트
   useEffect(() => {
@@ -85,15 +108,25 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     const remaining = Math.max(0, 5000 - elapsed);
     setCountdown(remaining);
 
-    // 5초 경과하면 AI 서버로 전송
+    // 5초 경과하면 캡처 시작
     if (elapsed >= 5000) {
-      console.log('[AI] Sending to server...');
+      console.log('[AI] 5 seconds elapsed, starting capture sequence...');
       // 타이머 멈춤 & analyzing 시작
       stillStartTime.current = null;
       isRunningRef.current = false; // 타이머 정지
       setIsAnalyzing(true);
 
-      await sendFeedback();
+      // 레슨별 프레임 설정 가져오기
+      const numericLessonId = parseInt(lessonId, 10);
+      const config = getFrameConfig(numericLessonId);
+
+      if (config.frameCount === 1) {
+        // 단일 프레임 - 기존 방식
+        await sendFeedback();
+      } else {
+        // 멀티 프레임 캡처
+        await captureMultipleFrames(config);
+      }
     }
   };
 
@@ -121,8 +154,61 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     });
   };
 
+  // 여러 프레임을 순차적으로 캡처
+  const captureMultipleFrames = async (config: FrameCaptureConfig) => {
+    const frames: Blob[] = [];
+    const { frameCount, intervalMs } = config;
+
+    setTotalFrames(frameCount);
+    setShowAnalyzingOverlay(false); // 초기에는 overlay 숨김
+
+    const FLASH_DURATION_MS = 500; // Overlay 표시 시간
+
+    console.log(`[Multi-Frame] Starting capture: ${frameCount} frames, ${intervalMs}ms interval`);
+
+    for (let i = 0; i < frameCount; i++) {
+      setCurrentFrame(i + 1);
+
+      // Overlay 표시 ("Capturing frame X/Y...")
+      setShowAnalyzingOverlay(true);
+      await new Promise(resolve => setTimeout(resolve, FLASH_DURATION_MS));
+
+      // 프레임 캡처
+      const frameBlob = await captureWebcamImage();
+      if (!frameBlob) {
+        console.error(`[Multi-Frame] Failed to capture frame ${i + 1}`);
+        setShowAnalyzingOverlay(false);
+        setIsAnalyzing(false);
+        onFeedback?.(`Failed to capture frame ${i + 1}. Please check your camera and try again.`, 0);
+        return;
+      }
+
+      frames.push(frameBlob);
+      console.log(`[Multi-Frame] Frame ${i + 1} captured, size: ${frameBlob.size} bytes`);
+
+      // Overlay 숨김 (웹캠 화면 보임)
+      setShowAnalyzingOverlay(false);
+
+      // 다음 프레임까지 대기 (마지막 프레임 제외)
+      if (i < frameCount - 1) {
+        const remainingInterval = intervalMs - FLASH_DURATION_MS;
+        await new Promise(resolve => setTimeout(resolve, remainingInterval));
+      }
+    }
+
+    setCapturedFrames(frames);
+    console.log(`[Multi-Frame] All ${frameCount} frames captured, sending to API...`);
+
+    // 모든 프레임 캡처 완료 - Analyzing 표시
+    setShowAnalyzingOverlay(true);
+    setCurrentFrame(0); // currentFrame을 0으로 설정하여 "Analyzing..." 텍스트 표시
+
+    // 모든 프레임을 API로 전송
+    await sendFeedback(frames);
+  };
+
   // AI 서버로 이미지를 보내는 함수
-  const sendFeedback = async () => {
+  const sendFeedback = async (frames?: Blob[]) => {
     if (!lessonId) return;
 
     const numericLessonId = parseInt(lessonId, 10);
@@ -132,17 +218,20 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     }
 
     try {
-      // 웹캠 이미지 캡처
-      const imageBlob = await captureWebcamImage();
-      if (!imageBlob) {
-        console.error('Failed to capture webcam image');
+      // 단일 프레임 또는 멀티 프레임 처리
+      const imagesToSend = frames || [await captureWebcamImage()];
+
+      // 모든 프레임 유효성 검사
+      if (imagesToSend.some(blob => !blob)) {
+        console.error('Failed to capture one or more images');
+        setIsAnalyzing(false);
         return;
       }
 
-      console.log('📷 Captured image, size:', imageBlob.size, 'bytes');
+      console.log(`📷 Sending ${imagesToSend.length} frame(s) to AI server`);
 
-      // AI 서버로 이미지 전송
-      const data = await aiApi.sendFeedback(numericLessonId, imageBlob);
+      // AI 서버로 전송
+      const data = await aiApi.sendFeedback(numericLessonId, imagesToSend);
       console.log('AI Server response:', data);
 
       // 서버에서 받은 score를 0~100으로 변환 (서버는 0~1 사이로 보냄)
@@ -166,6 +255,12 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     } catch (error) {
       console.error('Failed to send feedback to AI server:', error);
       setIsAnalyzing(false); // 에러 시에도 analyzing 종료
+    } finally {
+      // 멀티 프레임 상태 초기화
+      setCapturedFrames([]);
+      setCurrentFrame(0);
+      setTotalFrames(1);
+      setShowAnalyzingOverlay(true); // 다음 세션을 위해 초기값으로 리셋
     }
   };
 
@@ -245,10 +340,14 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       )}
 
       {/* Analyzing Overlay */}
-      {isAnalyzing && (
+      {isAnalyzing && showAnalyzingOverlay && (
         <div className="camera-analyzing-overlay">
           <div className="analyzing-spinner"></div>
-          <div className="analyzing-text">Analyzing...</div>
+          <div className="analyzing-text">
+            {totalFrames > 1 && currentFrame > 0 && currentFrame <= totalFrames
+              ? `Capturing frame ${currentFrame}/${totalFrames}...`
+              : 'Analyzing...'}
+          </div>
         </div>
       )}
 
