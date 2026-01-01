@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { learningHistoryApi } from '../services/api';
 import { authService } from '../services/authService';
@@ -24,8 +24,7 @@ export default function ProfilePage() {
   const [histories, setHistories] = useState<LearningHistory[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'date' | 'category'>('date');
-
-  const user = authService.getUser();
+  const [user] = useState(() => authService.getUser());
 
   // Redirect to home if not logged in
   useEffect(() => {
@@ -34,14 +33,8 @@ export default function ProfilePage() {
     }
   }, [user, navigate]);
 
-  // Load histories when date or view mode changes
-  useEffect(() => {
-    if (user && viewMode === 'date') {
-      loadHistories();
-    }
-  }, [selectedDate, user, viewMode]);
-
-  const loadHistories = async () => {
+  // Memoize loadHistories to prevent unnecessary API calls
+  const loadHistories = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -54,10 +47,17 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, selectedDate]);
 
-  // Group histories by category
-  const groupByCategory = (histories: LearningHistory[]) => {
+  // Load histories when date changes
+  useEffect(() => {
+    if (user) {
+      loadHistories();
+    }
+  }, [loadHistories, user]);
+
+  // Group histories by category (memoized to prevent flickering)
+  const groupedHistories = useMemo(() => {
     const grouped = histories.reduce((acc, history) => {
       const key = history.categoryId;
       if (!acc[key]) {
@@ -72,10 +72,10 @@ export default function ProfilePage() {
     }, {} as Record<number, { categoryId: number; categoryName: string; items: LearningHistory[] }>);
 
     return Object.values(grouped);
-  };
+  }, [histories]);
 
-  // Calculate stats
-  const calculateStats = (histories: LearningHistory[]) => {
+  // Calculate stats (memoized)
+  const stats = useMemo(() => {
     if (histories.length === 0) {
       return { totalLessons: 0, averageScore: 0, totalTime: 0 };
     }
@@ -87,7 +87,7 @@ export default function ProfilePage() {
     const totalTime = histories.reduce((sum, h) => sum + h.practiceSeconds, 0);
 
     return { totalLessons, averageScore, totalTime };
-  };
+  }, [histories]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -105,9 +105,6 @@ export default function ProfilePage() {
   if (!user) {
     return null; // Will redirect in useEffect
   }
-
-  const stats = calculateStats(histories);
-  const groupedHistories = groupByCategory(histories);
 
   return (
     <div className="page">
@@ -172,13 +169,13 @@ export default function ProfilePage() {
           </section>
         )}
 
-        {/* Loading State */}
-        {loading && (
+        {/* Loading State - Date View only */}
+        {loading && viewMode === 'date' && (
           <div className="history-loading">Loading learning history...</div>
         )}
 
-        {/* Empty State */}
-        {!loading && histories.length === 0 && (
+        {/* Empty State - Date View only */}
+        {!loading && viewMode === 'date' && histories.length === 0 && (
           <div className="history-empty">
             <div className="empty-icon">📚</div>
             <h3>No learning history</h3>
@@ -212,7 +209,7 @@ export default function ProfilePage() {
         )}
 
         {/* Category View - Grouped by category */}
-        {!loading && viewMode === 'category' && histories.length > 0 && (
+        {viewMode === 'category' && histories.length > 0 && (
           <section className="category-view">
             <h2 className="section-title">Learning by Category</h2>
             {groupedHistories.map((group) => (
@@ -236,6 +233,15 @@ export default function ProfilePage() {
               </div>
             ))}
           </section>
+        )}
+
+        {/* Empty State - Category View */}
+        {viewMode === 'category' && histories.length === 0 && (
+          <div className="history-empty">
+            <div className="empty-icon">📚</div>
+            <h3>No learning history</h3>
+            <p>Start practicing to see your progress here!</p>
+          </div>
         )}
       </div>
     </div>
