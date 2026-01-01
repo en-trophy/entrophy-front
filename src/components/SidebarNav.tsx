@@ -1,31 +1,36 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { isAuthenticated } from '../utils/auth';
+import { authService } from '../services/authService';
+import { authApi } from '../services/api';
 import './SidebarNav.css';
 
 type NavItem = {
     label: string;
     to: string;
     icon: string;
+    isAction?: boolean;
 };
 
 export default function SidebarNav() {
     const [collapsed, setCollapsed] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+    const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 
     // 인증 상태에 따른 네비게이션 아이템 구성
     const authItems: NavItem[] = isLoggedIn
-        ? [{ label: 'Profile', to: '/profile', icon: '👤' }]
+        ? [
+            { label: 'Profile', to: '/profile', icon: '👤' },
+            { label: 'Logout', to: '/logout', icon: '🚪', isAction: true },
+          ]
         : [
             { label: 'Login', to: '/login', icon: '🔑' },
             { label: 'Sign Up', to: '/login?signup=true', icon: '✍️' },
-        ];
+          ];
 
     const mainItems: NavItem[] = [
         { label: 'Learn', to: '/', icon: '🏠' },
         { label: 'Practice Today', to: '/simulation', icon: '🎯' },
         { label: 'Alphabet', to: '/alphabet', icon: '🔤' },
-        { label: 'Learning History', to: '/history', icon: '🕘' },
+        { label: 'Learning History', to: '/profile', icon: '🕘' },
     ];
 
     useEffect(() => {
@@ -40,7 +45,7 @@ export default function SidebarNav() {
     // 인증 상태 변경 감지 (로그인/로그아웃 시 사이드바 업데이트)
     useEffect(() => {
         const checkAuthStatus = () => {
-            setIsLoggedIn(isAuthenticated());
+            setIsLoggedIn(authService.isAuthenticated());
         };
 
         // storage 이벤트로 로그인/로그아웃 감지
@@ -54,6 +59,12 @@ export default function SidebarNav() {
             clearInterval(interval);
         };
     }, []);
+
+    const handleLogout = () => {
+        authApi.logout();
+        setIsLoggedIn(false);
+        window.location.href = '/';
+    };
 
     return (
         <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
@@ -70,22 +81,36 @@ export default function SidebarNav() {
             </div>
 
             <nav className="sidebar-menu">
-                {/* 인증 관련 버튼 (Profile 또는 Login/Sign Up) */}
-                {authItems.map((item) => (
-                    <NavLink
-                        key={item.to}
-                        to={item.to}
-                        className={({ isActive }) =>
-                            `sidebar-link ${isActive ? 'active' : ''}`
-                        }
-                        title={collapsed ? item.label : undefined}
-                    >
-                        <span className="sidebar-icon" aria-hidden>
-                            {item.icon}
-                        </span>
-                        {!collapsed && <span className="sidebar-label">{item.label}</span>}
-                    </NavLink>
-                ))}
+                {/* 인증 관련 버튼 (Profile 또는 Login/Sign Up, Logout) */}
+                {authItems.map((item) =>
+                    item.isAction ? (
+                        <button
+                            key={item.to}
+                            className="sidebar-link"
+                            onClick={handleLogout}
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <span className="sidebar-icon" aria-hidden>
+                                {item.icon}
+                            </span>
+                            {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                        </button>
+                    ) : (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) =>
+                                `sidebar-link ${isActive ? 'active' : ''}`
+                            }
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <span className="sidebar-icon" aria-hidden>
+                                {item.icon}
+                            </span>
+                            {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                        </NavLink>
+                    )
+                )}
 
                 {/* 구분선 */}
                 <div className="sidebar-divider"></div>

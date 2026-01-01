@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { backendApi } from '../services/api';
+import { backendApi, learningHistoryApi } from '../services/api';
+import { authService } from '../services/authService';
 import type { Lesson } from '../types';
 import Header from '../components/Header';
 import './ResultPage.css';
@@ -20,6 +21,33 @@ export default function ResultPage() {
   useEffect(() => {
     loadData();
   }, [lessonId]);
+
+  // Save learning history after lesson data is loaded (if user is logged in)
+  useEffect(() => {
+    const saveLearningHistory = async () => {
+      const user = authService.getUser();
+
+      // Only save if user is logged in and lesson data is available
+      if (user && lesson && !loading) {
+        try {
+          await learningHistoryApi.createHistory({
+            userId: user.userId,
+            categoryId: lesson.categoryId,
+            lessonId: lesson.id,
+            score: finalScore,
+            practiceSeconds: practiceTime,
+            aiFeedback: getScoreMessage(finalScore),
+          });
+          console.log('✅ Learning history saved');
+        } catch (error) {
+          console.error('Failed to save learning history:', error);
+          // Continue showing result page even if save fails
+        }
+      }
+    };
+
+    saveLearningHistory();
+  }, [lesson, loading]);
 
   const loadData = async () => {
     if (!lessonId) return;

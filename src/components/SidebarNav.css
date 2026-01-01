@@ -129,6 +129,17 @@
     transition: transform 0.06s ease, background 0.12s ease;
 }
 
+/* 버튼으로 사용되는 sidebar-link (로그아웃 등) */
+button.sidebar-link {
+    width: 100%;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+
 .sidebar.collapsed .sidebar-link {
     justify-content: center;
     padding: 12px 8px;

@@ -1,4 +1,5 @@
-import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse, SimulationRequest, SimulationResponse } from '../types';
+import type { Category, Lesson, SignupRequest, LoginRequest, LoginResponse, SimulationRequest, SimulationResponse, LearningHistoryRequest, LearningHistoryResponse, LearningHistory } from '../types';
+import { authService } from './authService';
 
 // 환경 변수로 API URL 관리 (.env.development, .env.production 파일 참조)
 // 프로덕션 배포 시 환경 변수가 없으면 기본값 사용
@@ -84,7 +85,22 @@ export const authApi = {
       throw new Error(error || 'Login failed');
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // 토큰 및 사용자 정보 저장
+    authService.setToken(data.accessToken);
+    authService.setUser({
+      userId: data.userId,
+      loginId: data.loginId,
+      name: data.name,
+    });
+
+    return data;
+  },
+
+  // Logout user
+  logout() {
+    authService.logout();
   },
 };
 
@@ -141,6 +157,45 @@ export const aiApi = {
 
     if (!response.ok) {
       throw new Error(`Failed to create simulation: ${response.status}`);
+    }
+
+    return response.json();
+  },
+};
+
+// Learning History API calls
+export const learningHistoryApi = {
+  // 학습 기록 저장
+  async createHistory(request: LearningHistoryRequest): Promise<LearningHistoryResponse> {
+    const response = await fetch(`${BACKEND_API_URL}/api/learning-histories`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authService.getAuthHeader(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save learning history');
+    }
+
+    return response.json();
+  },
+
+  // 학습 기록 조회 (날짜별)
+  async getHistories(userId: number, date: string): Promise<LearningHistory[]> {
+    const response = await fetch(
+      `${BACKEND_API_URL}/api/learning-histories?userId=${userId}&date=${date}`,
+      {
+        headers: {
+          ...authService.getAuthHeader(),
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch learning histories');
     }
 
     return response.json();
