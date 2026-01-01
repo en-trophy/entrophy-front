@@ -195,7 +195,6 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       }
     }
 
-    setCapturedFrames(frames);
     console.log(`[Multi-Frame] All ${frameCount} frames captured, sending to API...`);
 
     // 모든 프레임 캡처 완료 - Analyzing 표시
@@ -259,7 +258,6 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       setIsAnalyzing(false); // 에러 시에도 analyzing 종료
     } finally {
       // 멀티 프레임 상태 초기화
-      setCapturedFrames([]);
       setCurrentFrame(0);
       setTotalFrames(1);
       setShowAnalyzingOverlay(true); // 다음 세션을 위해 초기값으로 리셋
