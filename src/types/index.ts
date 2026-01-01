@@ -169,3 +169,33 @@ export interface SimulationResponse {
   image_url: string;
   dialogue: DialogueLine[];
 }
+
+// 학습 기록 관련 타입
+// 학습 기록 저장 요청
+export interface LearningHistoryRequest {
+  userId: number;
+  categoryId: number;
+  lessonId: number;
+  score: number;
+  practiceSeconds: number;
+  aiFeedback: string;
+}
+
+// 학습 기록 저장 응답
+export interface LearningHistoryResponse {
+  historyId: number;
+  createdAt: string;
+}
+
+// 학습 기록 항목
+export interface LearningHistory {
+  historyId: number;
+  lessonId: number;
+  lessonTitle: string;
+  categoryId: number;
+  categoryName: string;
+  score: number;
+  practiceSeconds: number;
+  aiFeedback: string;
+  createdAt: string;
+}

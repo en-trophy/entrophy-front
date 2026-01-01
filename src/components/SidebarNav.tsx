@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { isAuthenticated } from '../utils/auth';
+import { authService } from '../services/authService';
 import './SidebarNav.css';
 
 type NavItem = {
@@ -11,7 +11,7 @@ type NavItem = {
 
 export default function SidebarNav() {
     const [collapsed, setCollapsed] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+    const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 
     // 인증 상태에 따른 네비게이션 아이템 구성
     const authItems: NavItem[] = isLoggedIn
@@ -40,7 +40,7 @@ export default function SidebarNav() {
     // 인증 상태 변경 감지 (로그인/로그아웃 시 사이드바 업데이트)
     useEffect(() => {
         const checkAuthStatus = () => {
-            setIsLoggedIn(isAuthenticated());
+            setIsLoggedIn(authService.isAuthenticated());
         };
 
         // storage 이벤트로 로그인/로그아웃 감지
