@@ -1,40 +1,27 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.js", "/*.mjs", "/*.css", "/*.json", "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.wasm"]
+    "exclude": ["/assets/*"]
   },
   "routes": [
     {
-      "route": "/assets/*",
+      "route": "/assets/*.js",
       "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable",
-        "Content-Type": "application/javascript; charset=utf-8"
+        "Content-Type": "application/javascript"
       }
     },
     {
-      "route": "/*.js",
+      "route": "/assets/*.css",
       "headers": {
-        "Content-Type": "text/javascript; charset=utf-8"
-      }
-    },
-    {
-      "route": "/*.mjs",
-      "headers": {
-        "Content-Type": "text/javascript; charset=utf-8"
-      }
-    },
-    {
-      "route": "/*.svg",
-      "headers": {
-        "Content-Type": "image/svg+xml"
+        "Content-Type": "text/css"
       }
     }
   ],
   "mimeTypes": {
-    ".js": "text/javascript",
-    ".mjs": "text/javascript",
-    ".json": "application/json",
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
     ".css": "text/css",
+    ".json": "application/json",
     ".html": "text/html",
     ".svg": "image/svg+xml",
     ".png": "image/png",
@@ -44,10 +31,6 @@
     ".wasm": "application/wasm"
   },
   "globalHeaders": {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
-  },
-  "platform": {
-    "apiRuntime": "node:16"
+    "Access-Control-Allow-Origin": "*"
   }
 }
