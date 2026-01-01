@@ -15,7 +15,7 @@ interface FrameCaptureConfig {
 
 // 하드코딩된 설정 (향후 백엔드에서 받아올 예정)
 const LESSON_FRAME_CONFIG: Record<number, FrameCaptureConfig> = {
-  4: { frameCount: 2, intervalMs: 500 }, // "thank you" - 2프레임, 0.5초 간격
+  4: { frameCount: 2, intervalMs: 1000 }, // "thank you" - 2프레임, 1초 간격
 };
 
 const DEFAULT_FRAME_CONFIG: FrameCaptureConfig = {
@@ -162,7 +162,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
     setTotalFrames(frameCount);
     setShowAnalyzingOverlay(false); // 초기에는 overlay 숨김
 
-    const FLASH_DURATION_MS = 150; // Overlay 표시 시간
+    const FLASH_DURATION_MS = 500; // Overlay 표시 시간
 
     console.log(`[Multi-Frame] Starting capture: ${frameCount} frames, ${intervalMs}ms interval`);
 
