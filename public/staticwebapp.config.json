@@ -1,36 +1,18 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*"]
+    "exclude": ["/assets/*", "/*.js", "/*.css", "/*.json", "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.wasm"]
   },
-  "routes": [
-    {
-      "route": "/assets/*.js",
-      "headers": {
-        "Content-Type": "application/javascript"
-      }
-    },
-    {
-      "route": "/assets/*.css",
-      "headers": {
-        "Content-Type": "text/css"
-      }
-    }
-  ],
   "mimeTypes": {
-    ".js": "application/javascript",
-    ".mjs": "application/javascript",
-    ".css": "text/css",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
     ".json": "application/json",
+    ".css": "text/css",
     ".html": "text/html",
-    ".svg": "image/svg+xml",
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".ico": "image/x-icon",
     ".wasm": "application/wasm"
   },
   "globalHeaders": {
-    "Access-Control-Allow-Origin": "*"
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"
   }
 }
