@@ -7,7 +7,8 @@ import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
 import { drawConnectors } from '@mediapipe/drawing_utils';
 import Header from '../components/Header';
 import SidebarNav from '../components/SidebarNav';
-import { aiApi } from '../services/api';
+import { aiApi, learningHistoryApi } from '../services/api';
+import { authService } from '../services/authService';
 import type { SimulationResponse } from '../types';
 import './SimulationPage.css';
 
@@ -71,10 +72,35 @@ export default function SimulationPage() {
     try {
       console.log('📡 loadSimulation called - Fetching from API...');
       setLoading(true);
-      // TODO: 나중에 백엔드에서 오늘 배운 lesson_ids를 가져오기
-      // 지금은 테스트용으로 하드코딩
-      const testLessonIds = [1, 2];
-      const data = await aiApi.createSimulation({ lesson_ids: testLessonIds });
+
+      // Check if user is logged in
+      const user = authService.getUser();
+      if (!user) {
+        // Redirect to login page
+        navigate('/login');
+        return;
+      }
+
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date().toISOString().split('T')[0];
+
+      // Fetch today's learning history
+      const histories = await learningHistoryApi.getHistories(user.userId, today);
+
+      // Extract unique lesson IDs from today's learning history
+      const lessonIds = [...new Set(histories.map(h => h.lessonId))];
+
+      if (lessonIds.length === 0) {
+        // No learning history for today
+        setError('No learning history for today. Please complete some lessons first!');
+        setLoading(false);
+        return;
+      }
+
+      console.log('📚 Today\'s lesson IDs:', lessonIds);
+
+      // Create simulation with today's lessons
+      const data = await aiApi.createSimulation({ lesson_ids: lessonIds });
       console.log('✅ Simulation received:', data);
       setSimulation(data);
       setError(null);
@@ -345,7 +371,7 @@ export default function SimulationPage() {
               <div className="simulation-error">
                 <p>{error || 'Failed to load simulation'}</p>
                 <button onClick={() => navigate('/')} className="button-primary">
-                  Go Home
+                  {error?.includes('No learning history') ? 'Start Learning' : 'Go Home'}
                 </button>
               </div>
             </div>
