@@ -30,7 +30,7 @@ export default function SidebarNav() {
         { label: 'Learn', to: '/', icon: '🏠' },
         { label: 'Practice Today', to: '/simulation', icon: '🎯' },
         { label: 'Alphabet', to: '/alphabet', icon: '🔤' },
-        { label: 'Learning History', to: '/history', icon: '🕘' },
+        { label: 'Learning History', to: '/profile', icon: '🕘' },
     ];
 
     useEffect(() => {
