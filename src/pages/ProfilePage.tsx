@@ -26,12 +26,7 @@ export default function ProfilePage() {
   const [viewMode, setViewMode] = useState<'date' | 'category'>('date');
   const [user] = useState(() => authService.getUser());
 
-  // Redirect to home if not logged in
-  useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+  // No automatic redirect - show login prompt instead
 
   // Memoize loadHistories to prevent unnecessary API calls
   const loadHistories = useCallback(async () => {
@@ -103,7 +98,30 @@ export default function ProfilePage() {
   };
 
   if (!user) {
-    return null; // Will redirect in useEffect
+    return (
+      <div className="page">
+        <div className="page-container profile-container">
+          <Header />
+          <div className="login-required-container">
+            <div className="login-required-card">
+              <div className="login-required-icon">🔒</div>
+              <h2 className="login-required-title">Login Required</h2>
+              <p className="login-required-message">
+                Please log in to view your learning history and track your progress.
+              </p>
+              <div className="login-required-buttons">
+                <button className="login-button" onClick={() => navigate('/login')}>
+                  Go to Login
+                </button>
+                <button className="back-button-secondary" onClick={() => navigate('/')}>
+                  Back to Home
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
