@@ -201,7 +201,7 @@ export default function ProfilePage() {
                   <p className="history-feedback">{history.aiFeedback}</p>
                 )}
                 <div className="history-date">
-                  {new Date(history.createdAt).toLocaleString()}
+                  {new Date(history.createdAt).toLocaleString('en-US')}
                 </div>
               </div>
             ))}
@@ -225,7 +225,7 @@ export default function ProfilePage() {
                         <span className="category-item-score">{history.score}pts</span>
                       </div>
                       <div className="category-item-time">
-                        {formatTime(history.practiceSeconds)} • {new Date(history.createdAt).toLocaleDateString()}
+                        {formatTime(history.practiceSeconds)} • {new Date(history.createdAt).toLocaleDateString('en-US')}
                       </div>
                     </div>
                   ))}
