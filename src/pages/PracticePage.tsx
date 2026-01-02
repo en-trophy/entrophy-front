@@ -88,8 +88,7 @@ export default function PracticePage() {
   };
 
   const handleExit = () => {
-    const confirmed = window.confirm('Are you sure you want to exit? Your progress will not be saved.');
-    if (confirmed && lesson) {
+    if (lesson) {
       navigate(`/lesson/${lesson.id}`);
     }
   };
