@@ -317,6 +317,109 @@
   color: #605e5c;
 }
 
+/* Login Required */
+.login-required-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 48px 24px;
+}
+
+.login-required-card {
+  background: white;
+  border-radius: 20px;
+  padding: 64px 48px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  max-width: 500px;
+  width: 100%;
+  animation: fadeInUp 0.5s ease;
+}
+
+.login-required-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.login-required-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #323130;
+  margin: 0 0 16px 0;
+}
+
+.login-required-message {
+  font-size: 18px;
+  color: #605e5c;
+  line-height: 1.6;
+  margin: 0 0 32px 0;
+}
+
+.login-required-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.login-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+.back-button-secondary {
+  background: white;
+  color: #605e5c;
+  border: 2px solid #e1dfdd;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-button-secondary:hover {
+  border-color: #0078d4;
+  color: #0078d4;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .stats-summary {
@@ -338,5 +441,26 @@
 
   .date-display {
     order: -1;
+  }
+
+  .login-required-card {
+    padding: 48px 24px;
+  }
+
+  .login-required-title {
+    font-size: 28px;
+  }
+
+  .login-required-icon {
+    font-size: 64px;
+  }
+
+  .login-required-buttons {
+    flex-direction: column;
+  }
+
+  .login-button,
+  .back-button-secondary {
+    width: 100%;
   }
 }
