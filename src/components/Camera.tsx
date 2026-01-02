@@ -15,7 +15,7 @@ interface FrameCaptureConfig {
 
 // 하드코딩된 설정 (향후 백엔드에서 받아올 예정)
 const LESSON_FRAME_CONFIG: Record<number, FrameCaptureConfig> = {
-  4: { frameCount: 2, intervalMs: 1000 }, // "thank you" - 2프레임, 1초 간격
+  4: { frameCount: 2, intervalMs: 1500 }, // "thank you" - 2프레임, 1.5초 간격
 };
 
 const DEFAULT_FRAME_CONFIG: FrameCaptureConfig = {
