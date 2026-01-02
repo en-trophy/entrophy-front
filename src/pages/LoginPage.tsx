@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,14 +39,19 @@ export default function LoginPage() {
 
     try {
       await authApi.signup({ loginId, password, name });
-      alert('Sign up successful! Please login.');
-      setIsSignup(false);
-      setPassword('');
+      setShowSuccessModal(true);
     } catch (err: any) {
       setError(err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setIsSignup(false);
+    setPassword('');
+    setName('');
   };
 
   return (
@@ -135,6 +141,20 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay" onClick={handleSuccessModalClose}>
+          <div className="success-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="success-icon">🎉</div>
+            <h2>Sign Up Successful!</h2>
+            <p>Your account has been created successfully. Please log in to continue.</p>
+            <button className="success-button" onClick={handleSuccessModalClose}>
+              Continue to Login
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
