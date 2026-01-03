@@ -7,7 +7,7 @@ import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
 import { drawConnectors } from '@mediapipe/drawing_utils';
 import Header from '../components/Header';
 import SidebarNav from '../components/SidebarNav';
-import { aiApi, learningHistoryApi } from '../services/api';
+import { aiApi, learningHistoryApi, backendApi } from '../services/api';
 import { authService } from '../services/authService';
 import type { SimulationResponse } from '../types';
 import './SimulationPage.css';
@@ -22,6 +22,7 @@ export default function SimulationPage() {
   const simulationRef = useRef<SimulationResponse | null>(null); // simulation을 ref로 저장
   const currentDialogueIndexRef = useRef<number>(0); // currentDialogueIndex를 ref로 저장
   const hasLoadedRef = useRef<boolean>(false); // 시뮬레이션 로드 여부 체크
+  const frameCountsMapRef = useRef<Map<number, number>>(new Map()); // frameCountsMap을 ref로 저장
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +40,10 @@ export default function SimulationPage() {
     message: string;
     score: number;
   } | null>(null);
+  const [frameCountsMap, setFrameCountsMap] = useState<Map<number, number>>(new Map()); // lessonId -> frameCount
+  const [currentFrame, setCurrentFrame] = useState(0); // 현재 캡처 중인 프레임 번호
+  const [totalFrames, setTotalFrames] = useState(1); // 총 캡처할 프레임 수
+  const [showAnalyzingOverlay, setShowAnalyzingOverlay] = useState(true); // 분석/캡처 오버레이 표시 (Camera.tsx와 동일)
 
   // isChecking prop이 변경될 때 ref 업데이트
   useEffect(() => {
@@ -55,6 +60,11 @@ export default function SimulationPage() {
   useEffect(() => {
     currentDialogueIndexRef.current = currentDialogueIndex;
   }, [currentDialogueIndex]);
+
+  // frameCountsMap이 변경될 때 ref 업데이트
+  useEffect(() => {
+    frameCountsMapRef.current = frameCountsMap;
+  }, [frameCountsMap]);
 
   // Load simulation data
   useEffect(() => {
@@ -112,6 +122,33 @@ export default function SimulationPage() {
       console.log('✅ Simulation received:', data);
       setSimulation(data);
       setError(null);
+
+      // Load frame counts for all target lessons in dialogue
+      const frameCountsMap = new Map<number, number>();
+      const targetLessonIds = data.dialogue
+        .filter(d => d.target_lesson_id)
+        .map(d => d.target_lesson_id!);
+
+      // Get unique target lesson IDs
+      const uniqueTargetIds = [...new Set(targetLessonIds)];
+
+      // Fetch frame counts for each lesson
+      await Promise.all(
+        uniqueTargetIds.map(async (lessonId) => {
+          try {
+            const frameData = await backendApi.getAnswerFramesCount(lessonId);
+            frameCountsMap.set(lessonId, frameData.frameCount);
+            console.log(`📸 Lesson ${lessonId} requires ${frameData.frameCount} frame(s)`);
+          } catch (err) {
+            console.error(`Failed to load frame count for lesson ${lessonId}:`, err);
+            frameCountsMap.set(lessonId, 1); // 기본값
+          }
+        })
+      );
+
+      // Update both state and ref
+      setFrameCountsMap(frameCountsMap);
+      frameCountsMapRef.current = frameCountsMap;
 
       // 첫 대화가 User 차례면 바로 인식 시작 준비
       if (data.dialogue.length > 0 && data.dialogue[0].speaker === 'User') {
@@ -256,6 +293,54 @@ export default function SimulationPage() {
     });
   };
 
+  // Capture multiple frames sequentially
+  const captureMultipleFrames = async (frameCount: number, intervalMs: number): Promise<Blob[]> => {
+    const frames: Blob[] = [];
+
+    setTotalFrames(frameCount);
+    setShowAnalyzingOverlay(false); // 초기에는 overlay 숨김
+
+    const FLASH_DURATION_MS = 500; // Overlay 표시 시간
+
+    console.log(`[Multi-Frame] Starting capture: ${frameCount} frames, ${intervalMs}ms interval`);
+
+    for (let i = 0; i < frameCount; i++) {
+      setCurrentFrame(i + 1);
+
+      // Overlay 표시 ("Capturing frame X/Y...")
+      setShowAnalyzingOverlay(true);
+      await new Promise(resolve => setTimeout(resolve, FLASH_DURATION_MS));
+
+      // 프레임 캡처
+      const frameBlob = await captureWebcamImage();
+      if (!frameBlob) {
+        console.error(`[Multi-Frame] Failed to capture frame ${i + 1}`);
+        setShowAnalyzingOverlay(false);
+        throw new Error(`Failed to capture frame ${i + 1}. Please check your camera and try again.`);
+      }
+
+      frames.push(frameBlob);
+      console.log(`[Multi-Frame] Frame ${i + 1} captured, size: ${frameBlob.size} bytes`);
+
+      // Overlay 숨김 (웹캠 화면 보임)
+      setShowAnalyzingOverlay(false);
+
+      // 다음 프레임까지 대기 (마지막 프레임 제외)
+      if (i < frameCount - 1) {
+        const remainingInterval = intervalMs - FLASH_DURATION_MS;
+        await new Promise(resolve => setTimeout(resolve, remainingInterval));
+      }
+    }
+
+    console.log(`[Multi-Frame] All ${frameCount} frames captured, sending to API...`);
+
+    // 모든 프레임 캡처 완료 - Analyzing 표시
+    setShowAnalyzingOverlay(true);
+    setCurrentFrame(0); // currentFrame을 0으로 설정하여 "Analyzing..." 텍스트 표시
+
+    return frames;
+  };
+
   // Start checking when button is clicked
   const handleStart = () => {
     setIsChecking(true);
@@ -281,18 +366,34 @@ export default function SimulationPage() {
     setIsAnalyzing(true);
 
     try {
-      console.log('📷 Capturing image...');
-      const imageBlob = await captureWebcamImage();
-      if (!imageBlob) {
-        console.log('❌ Failed to capture image');
-        setCurrentFeedback({ message: 'Failed to capture image', score: 0 });
-        setShowFeedbackModal(true);
-        setIsAnalyzing(false);
-        return;
+      // Get frame count for this lesson from ref
+      const frameCount = frameCountsMapRef.current.get(currentDialogue.target_lesson_id) || 1;
+      console.log(`📸 Lesson ${currentDialogue.target_lesson_id} requires ${frameCount} frame(s)`);
+
+      let imagesToSend: Blob | Blob[];
+
+      if (frameCount > 1) {
+        // Multi-frame capture
+        console.log('📷 Capturing multiple frames...');
+        const intervalMs = 1500; // 1.5 seconds between frames
+        const frames = await captureMultipleFrames(frameCount, intervalMs);
+        imagesToSend = frames;
+      } else {
+        // Single frame capture
+        console.log('📷 Capturing single image...');
+        const imageBlob = await captureWebcamImage();
+        if (!imageBlob) {
+          console.log('❌ Failed to capture image');
+          setCurrentFeedback({ message: 'Failed to capture image', score: 0 });
+          setShowFeedbackModal(true);
+          setIsAnalyzing(false);
+          return;
+        }
+        imagesToSend = imageBlob;
       }
 
       console.log('🚀 Sending to AI server with lesson ID:', currentDialogue.target_lesson_id);
-      const feedback = await aiApi.sendFeedback(currentDialogue.target_lesson_id, imageBlob);
+      const feedback = await aiApi.sendFeedback(currentDialogue.target_lesson_id, imagesToSend);
       console.log('✅ Feedback received:', feedback);
 
       if (feedback.isCorrect) {
@@ -309,7 +410,8 @@ export default function SimulationPage() {
       }
     } catch (err) {
       console.error('❌ Failed to get feedback:', err);
-      setCurrentFeedback({ message: 'Failed to analyze. Please try again.', score: 0 });
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze. Please try again.';
+      setCurrentFeedback({ message: errorMessage, score: 0 });
       setShowFeedbackModal(true);
       setIsAnalyzing(false);
     }
@@ -318,6 +420,10 @@ export default function SimulationPage() {
   // Retry after feedback
   const handleRetry = () => {
     setShowFeedbackModal(false);
+    // Reset frame capture states
+    setCurrentFrame(0);
+    setTotalFrames(1);
+    setShowAnalyzingOverlay(true);
     setIsChecking(true);
   };
 
@@ -349,6 +455,11 @@ export default function SimulationPage() {
     setCurrentDialogueIndex(nextIndex);
     setIsChecking(false);
     setCountdown(5000);
+
+    // Reset frame capture states
+    setCurrentFrame(0);
+    setTotalFrames(1);
+    setShowAnalyzingOverlay(true);
 
     const nextDialogue = simulation.dialogue[nextIndex];
     if (nextDialogue.speaker === 'User') {
@@ -510,11 +621,15 @@ export default function SimulationPage() {
                       </div>
                     )}
 
-                    {/* Analyzing Overlay */}
-                    {isAnalyzing && (
+                    {/* Analyzing Overlay (Camera.tsx와 동일한 패턴) */}
+                    {isAnalyzing && showAnalyzingOverlay && (
                       <div className="simulation-analyzing-overlay">
                         <div className="analyzing-spinner"></div>
-                        <div className="analyzing-text">Analyzing...</div>
+                        <div className="analyzing-text">
+                          {totalFrames > 1 && currentFrame > 0 && currentFrame <= totalFrames
+                            ? `Capturing frame ${currentFrame}/${totalFrames}...`
+                            : 'Analyzing...'}
+                        </div>
                       </div>
                     )}
                   </div>
