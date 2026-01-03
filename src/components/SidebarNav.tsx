@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { authApi } from '../services/api';
 import './SidebarNav.css';
@@ -12,6 +12,7 @@ type NavItem = {
 };
 
 export default function SidebarNav() {
+    const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(authService.isAuthenticated());
 
@@ -116,22 +117,42 @@ export default function SidebarNav() {
                 <div className="sidebar-divider"></div>
 
                 {/* 메인 메뉴 (Learn, Alphabet, Learning History) */}
-                {mainItems.map((item) => (
-                    <NavLink
-                        key={item.to}
-                        to={item.to}
-                        end={item.to === '/'}
-                        className={({ isActive }) =>
-                            `sidebar-link ${isActive ? 'active' : ''}`
-                        }
-                        title={collapsed ? item.label : undefined}
-                    >
-                        <span className="sidebar-icon" aria-hidden>
-                            {item.icon}
-                        </span>
-                        {!collapsed && <span className="sidebar-label">{item.label}</span>}
-                    </NavLink>
-                ))}
+                {mainItems.map((item) =>
+                    item.label === 'Learning History' ? (
+                        <button
+                            key={item.to}
+                            className="sidebar-link"
+                            onClick={() => {
+                                if (!isLoggedIn) {
+                                    navigate('/login');
+                                } else {
+                                    navigate(item.to);
+                                }
+                            }}
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <span className="sidebar-icon" aria-hidden>
+                                {item.icon}
+                            </span>
+                            {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                        </button>
+                    ) : (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            end={item.to === '/'}
+                            className={({ isActive }) =>
+                                `sidebar-link ${isActive ? 'active' : ''}`
+                            }
+                            title={collapsed ? item.label : undefined}
+                        >
+                            <span className="sidebar-icon" aria-hidden>
+                                {item.icon}
+                            </span>
+                            {!collapsed && <span className="sidebar-label">{item.label}</span>}
+                        </NavLink>
+                    )
+                )}
             </nav>
 
             <div className="sidebar-footer">
