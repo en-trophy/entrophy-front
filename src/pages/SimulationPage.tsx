@@ -97,10 +97,18 @@ export default function SimulationPage() {
         return;
       }
 
-      console.log('📚 Today\'s lesson IDs:', lessonIds);
+      // If more than 3 lessons, randomly select 3
+      let selectedLessonIds = lessonIds;
+      if (lessonIds.length > 3) {
+        // Shuffle array and take first 3
+        selectedLessonIds = [...lessonIds].sort(() => Math.random() - 0.5).slice(0, 3);
+        console.log('📚 Selected 3 random lessons from', lessonIds.length, 'total lessons');
+      }
+
+      console.log('📚 Today\'s lesson IDs:', selectedLessonIds);
 
       // Create simulation with today's lessons
-      const data = await aiApi.createSimulation({ lesson_ids: lessonIds });
+      const data = await aiApi.createSimulation({ lesson_ids: selectedLessonIds });
       console.log('✅ Simulation received:', data);
       setSimulation(data);
       setError(null);
@@ -311,6 +319,12 @@ export default function SimulationPage() {
   const handleRetry = () => {
     setShowFeedbackModal(false);
     setIsChecking(true);
+  };
+
+  // Skip to next dialogue after feedback
+  const handleNext = () => {
+    setShowFeedbackModal(false);
+    moveToNextDialogue();
   };
 
   // Move to next dialogue after success
@@ -538,9 +552,14 @@ export default function SimulationPage() {
             <h2>Feedback</h2>
             <p className="feedback-score">Score: {Math.round(currentFeedback.score)}/100</p>
             <p className="feedback-message">{currentFeedback.message}</p>
-            <button className="retry-button" onClick={handleRetry}>
-              Try Again
-            </button>
+            <div className="feedback-buttons">
+              <button className="retry-button" onClick={handleRetry}>
+                Try Again
+              </button>
+              <button className="next-button" onClick={handleNext}>
+                Next
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -407,17 +407,29 @@
   line-height: 1.6;
 }
 
-.retry-button {
-  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
-  color: white;
+.feedback-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.retry-button,
+.next-button {
+  flex: 1;
+  max-width: 180px;
   border: none;
   padding: 16px 32px;
   font-size: 18px;
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 20px;
   transition: all 0.3s ease;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
   box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
 }
 
@@ -425,6 +437,18 @@
   background: linear-gradient(135deg, #005a9e 0%, #004578 100%);
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+.next-button {
+  background: linear-gradient(135deg, #16c60c 0%, #107c10 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(22, 198, 12, 0.3);
+}
+
+.next-button:hover {
+  background: linear-gradient(135deg, #107c10 0%, #0d5f0d 100%);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(22, 198, 12, 0.4);
 }
 
 /* Animations */
