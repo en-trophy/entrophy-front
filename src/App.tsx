@@ -8,11 +8,13 @@ import PracticePage from './pages/PracticePage';
 import ResultPage from './pages/ResultPage';
 import SimulationPage from './pages/SimulationPage';
 import ProfilePage from './pages/ProfilePage';
+import SessionTimeoutChecker from './components/SessionTimeoutChecker';
 import './App.css';
 
 function App() {
   return (
     <BrowserRouter>
+      <SessionTimeoutChecker />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />

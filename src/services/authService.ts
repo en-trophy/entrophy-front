@@ -2,11 +2,16 @@ import type { User } from '../types';
 
 const TOKEN_KEY = 'access_token';
 const USER_KEY = 'user_info';
+const SESSION_EXPIRY_KEY = 'session_expiry';
+const SESSION_DURATION_MS = 60 * 60 * 1000; // 60 minutes
 
 export const authService = {
   // 토큰 저장
   setToken(token: string) {
     localStorage.setItem(TOKEN_KEY, token);
+    // 세션 만료 시간 설정 (현재 시간 + 60분)
+    const expiryTime = Date.now() + SESSION_DURATION_MS;
+    localStorage.setItem(SESSION_EXPIRY_KEY, expiryTime.toString());
   },
 
   // 토큰 가져오기
@@ -40,10 +45,29 @@ export const authService = {
     return !!this.getToken();
   },
 
+  // 세션 만료 시간 가져오기
+  getSessionExpiry(): number | null {
+    const expiry = localStorage.getItem(SESSION_EXPIRY_KEY);
+    return expiry ? parseInt(expiry, 10) : null;
+  },
+
+  // 세션 만료 여부 확인
+  isSessionExpired(): boolean {
+    const expiry = this.getSessionExpiry();
+    if (!expiry) return false;
+    return Date.now() > expiry;
+  },
+
+  // 세션 만료 시간 삭제
+  removeSessionExpiry() {
+    localStorage.removeItem(SESSION_EXPIRY_KEY);
+  },
+
   // 로그아웃
   logout() {
     this.removeToken();
     this.removeUser();
+    this.removeSessionExpiry();
   },
 
   // Authorization 헤더 가져오기
