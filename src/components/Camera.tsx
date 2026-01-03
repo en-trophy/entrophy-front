@@ -335,7 +335,7 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       {/* 카운트다운 표시 */}
       {isWebcamReady && isRunning && !isAnalyzing && (
         <div className="camera-countdown">
-          Next check: {(countdown / 1000).toFixed(1)}s
+          Next check: {Math.ceil(countdown / 1000)}s
         </div>
       )}
 

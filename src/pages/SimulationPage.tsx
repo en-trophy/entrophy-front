@@ -493,7 +493,7 @@ export default function SimulationPage() {
                     {/* Countdown display (right top) */}
                     {isWebcamReady && isChecking && (
                       <div className="camera-countdown">
-                        {countdown === 0 ? 'Sending...' : `Next check: ${(countdown / 1000).toFixed(1)}s`}
+                        {countdown === 0 ? 'Sending...' : `Next check: ${Math.ceil(countdown / 1000)}s`}
                       </div>
                     )}
 
