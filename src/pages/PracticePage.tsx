@@ -23,9 +23,11 @@ export default function PracticePage() {
     score: number;
   } | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [frameCount, setFrameCount] = useState<number>(1);
 
   useEffect(() => {
     loadLesson();
+    loadFrameCount();
   }, [lessonId]);
 
   useEffect(() => {
@@ -50,6 +52,19 @@ export default function PracticePage() {
       console.error('Failed to load lesson:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadFrameCount = async () => {
+    if (!lessonId) return;
+
+    try {
+      const numericId = parseInt(lessonId, 10);
+      const data = await backendApi.getAnswerFramesCount(numericId);
+      setFrameCount(data.frameCount);
+    } catch (err) {
+      console.error('Failed to load frame count:', err);
+      setFrameCount(1); // 기본값
     }
   };
 
@@ -133,6 +148,10 @@ export default function PracticePage() {
         </div>
 
         <ScoreBoard score={score} targetWord={lesson.title} feedback={currentFeedback?.message} />
+
+        <div className="practice-info">
+          📸 After 5 seconds, {frameCount} {frameCount === 1 ? 'photo' : 'photos'} will be taken
+        </div>
 
         <div style={{ position: 'relative' }}>
           <Camera
