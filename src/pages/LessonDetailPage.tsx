@@ -103,9 +103,9 @@ export default function LessonDetailPage() {
               </div>
             )}
 
-            <div className="lesson-detail-preview">
-              <h2 className="lesson-section-title">Practice Preview</h2>
-              {lesson.imageUrl ? (
+            {lesson.imageUrl && (
+              <div className="lesson-detail-preview">
+                <h2 className="lesson-section-title">Practice Preview</h2>
                 <div className="preview-image-container">
                   <img
                     src={lesson.imageUrl}
@@ -113,13 +113,8 @@ export default function LessonDetailPage() {
                     className="preview-image"
                   />
                 </div>
-              ) : (
-                <div className="preview-placeholder">
-                  <div className="preview-icon">👁️</div>
-                  <p className="preview-text">Use your webcam to practice sign language in real-time</p>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <button className="start-practice-button" onClick={handleStartPractice}>
               Start Learning
