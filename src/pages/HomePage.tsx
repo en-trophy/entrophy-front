@@ -77,7 +77,15 @@ export default function HomePage() {
                 key={category.id}
                 className={`category-card ${!hasLessons ? 'disabled' : ''}`}
                 style={{ backgroundColor: getCategoryColor(category.code) }}
-                onClick={() => hasLessons && navigate(`/category/${category.id}`)}
+                onClick={() => {
+                  if (!hasLessons) return;
+                  // Alphabet category (id: 8) goes directly to word page
+                  if (category.id === 8) {
+                    navigate(`/category/8/word`);
+                  } else {
+                    navigate(`/category/${category.id}`);
+                  }
+                }}
                 disabled={!hasLessons}
               >
                 <div className="category-emoji">{category.iconEmoji}</div>
