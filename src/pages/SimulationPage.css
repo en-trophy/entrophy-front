@@ -416,15 +416,24 @@
 
 .retry-button,
 .next-button {
-  flex: 1;
-  max-width: 180px;
-  border: none;
-  padding: 16px 32px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 8px;
+  display: inline-block !important;
+  flex: 0 0 auto !important;
+  width: 150px !important;
+  height: 50px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  line-height: 50px !important;
+  border-radius: 8px !important;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 }
 
 .retry-button {
