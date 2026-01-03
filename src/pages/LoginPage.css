@@ -79,9 +79,9 @@
 }
 
 .login-tab.active {
-  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  background: linear-gradient(135deg, #000000 0%, #000000 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(0, 120, 212, 0.3);
+  box-shadow: 0 2px 8px rgba(68, 68, 68, 0.3);
 }
 
 .login-form {
@@ -119,7 +119,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #0078d4;
+  border-color: #000000;
   box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
 }
 
@@ -140,7 +140,7 @@
 
 .submit-button {
   padding: 16px;
-  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  background: linear-gradient(135deg, #000000 0%, #000000 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -148,13 +148,13 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+  box-shadow: 0 4px 16px rgba(72, 72, 72, 0.3);
   margin-top: 8px;
 }
 
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+  box-shadow: 0 6px 20px rgba(83, 83, 83, 0.4);
 }
 
 .submit-button:active:not(:disabled) {
@@ -181,8 +181,8 @@
 }
 
 .back-to-home:hover {
-  border-color: #0078d4;
-  color: #0078d4;
+  border-color: #313131;
+  color: #3a3a3a;
   background: rgba(0, 120, 212, 0.05);
 }
 
@@ -192,6 +192,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -199,21 +200,28 @@
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes shake {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(-8px);
   }
+
   75% {
     transform: translateX(8px);
   }
@@ -287,6 +295,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -297,6 +306,7 @@
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -304,9 +314,12 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
