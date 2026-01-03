@@ -112,8 +112,8 @@ export default function PracticePage() {
   if (loading) {
     return (
       <div className="practice-page">
+        <Header />
         <div className="practice-container">
-          <Header />
           <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
             Loading...
           </div>
@@ -125,8 +125,8 @@ export default function PracticePage() {
   if (!lesson) {
     return (
       <div className="practice-page">
+        <Header />
         <div className="practice-container">
-          <Header />
           <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
             Lesson not found.
           </div>
@@ -137,9 +137,9 @@ export default function PracticePage() {
 
   return (
     <div className="practice-page">
-      <div className="practice-container">
-        <Header />
+      <Header />
 
+      <div className="practice-container">
         <div className="practice-header">
           <button className="practice-exit-button" onClick={handleExit}>
             ← Exit
