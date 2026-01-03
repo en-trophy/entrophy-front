@@ -22,6 +22,7 @@ export default function PracticePage() {
     message: string;
     score: number;
   } | null>(null);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     loadLesson();
@@ -155,15 +156,44 @@ export default function PracticePage() {
         </div>
 
         <div className="practice-controls">
-          {lesson.signLanguage && (
-            <div className="practice-tips">
-              <strong>💡 Tip:</strong> {lesson.signLanguage}
-            </div>
-          )}
+          <button className="practice-hint-button" onClick={() => setShowHint(!showHint)}>
+            💡 {showHint ? 'Hide Hint' : 'Show Hint'}
+          </button>
           <button className="practice-complete-button" onClick={handleComplete}>
             Complete Learning
           </button>
         </div>
+
+        {/* Hint Section */}
+        {showHint && (
+          <div className="practice-hint-section">
+            {lesson.videoUrl ? (
+              <div className="hint-video-container">
+                <video
+                  src={lesson.videoUrl}
+                  controls
+                  autoPlay
+                  loop
+                  className="hint-video"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : lesson.imageUrl ? (
+              <div className="hint-image-container">
+                <img
+                  src={lesson.imageUrl}
+                  alt={`${lesson.title} hint`}
+                  className="hint-image"
+                />
+              </div>
+            ) : (
+              <div className="hint-no-media">
+                No visual hint available for this lesson.
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Success Modal */}
