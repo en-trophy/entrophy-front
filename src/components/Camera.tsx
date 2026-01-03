@@ -4,7 +4,7 @@ import { Holistic, HAND_CONNECTIONS, POSE_CONNECTIONS } from '@mediapipe/holisti
 import type { Results } from '@mediapipe/holistic';
 import { Camera as MediaPipeCamera } from '@mediapipe/camera_utils';
 import { drawConnectors } from '@mediapipe/drawing_utils';
-import { aiApi } from '../services/api';
+import { aiApi, backendApi } from '../services/api';
 import type { Pose } from '../types';
 import './Camera.css';
 
@@ -12,20 +12,6 @@ interface FrameCaptureConfig {
   frameCount: number;      // 캡처할 프레임 수
   intervalMs: number;      // 프레임 간 간격 (밀리초)
 }
-
-// 하드코딩된 설정 (향후 백엔드에서 받아올 예정)
-const LESSON_FRAME_CONFIG: Record<number, FrameCaptureConfig> = {
-  4: { frameCount: 2, intervalMs: 1500 }, // "thank you" - 2프레임, 1.5초 간격
-};
-
-const DEFAULT_FRAME_CONFIG: FrameCaptureConfig = {
-  frameCount: 1,
-  intervalMs: 0,
-};
-
-const getFrameConfig = (lessonId: number): FrameCaptureConfig => {
-  return LESSON_FRAME_CONFIG[lessonId] || DEFAULT_FRAME_CONFIG;
-};
 
 interface CameraProps {
   targetPose: Pose | null;
@@ -43,12 +29,40 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
   const holisticRef = useRef<Holistic | null>(null);
   const stillStartTime = useRef<number | null>(null);
   const isRunningRef = useRef<boolean>(isRunning); // isRunning을 ref로 저장
+  const frameConfigRef = useRef<FrameCaptureConfig>({ frameCount: 1, intervalMs: 0 }); // frameConfig를 ref로 저장
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [countdown, setCountdown] = useState(5000);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [totalFrames, setTotalFrames] = useState(1);
   const [showAnalyzingOverlay, setShowAnalyzingOverlay] = useState(true);
+
+  // Load frame config from API
+  useEffect(() => {
+    const loadFrameConfig = async () => {
+      try {
+        const numericLessonId = parseInt(lessonId, 10);
+        const data = await backendApi.getAnswerFramesCount(numericLessonId);
+
+        // frameCount에 따라 intervalMs 설정
+        const intervalMs = data.frameCount > 1 ? 1500 : 0;
+
+        frameConfigRef.current = {
+          frameCount: data.frameCount,
+          intervalMs,
+        };
+
+        setTotalFrames(data.frameCount);
+        console.log('📸 Frame config loaded:', { frameCount: data.frameCount, intervalMs });
+      } catch (error) {
+        console.error('Failed to load frame config:', error);
+        // 기본값 유지
+        frameConfigRef.current = { frameCount: 1, intervalMs: 0 };
+      }
+    };
+
+    loadFrameConfig();
+  }, [lessonId]);
 
   // isRunning prop이 변경될 때 ref 업데이트
   useEffect(() => {
@@ -115,9 +129,8 @@ export default function Camera({ lessonId, onScoreUpdate, onSuccess, onFeedback,
       isRunningRef.current = false; // 타이머 정지
       setIsAnalyzing(true);
 
-      // 레슨별 프레임 설정 가져오기
-      const numericLessonId = parseInt(lessonId, 10);
-      const config = getFrameConfig(numericLessonId);
+      const config = frameConfigRef.current;
+      console.log('📸 Using frame config:', config);
 
       if (config.frameCount === 1) {
         // 단일 프레임 - 기존 방식

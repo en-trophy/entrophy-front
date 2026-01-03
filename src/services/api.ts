@@ -54,6 +54,13 @@ export const backendApi = {
     if (!response.ok) throw new Error('Failed to fetch lessons by category');
     return response.json();
   },
+
+  // Get answer frames count for a lesson
+  async getAnswerFramesCount(lessonId: number): Promise<{ lessonId: number; frameCount: number }> {
+    const response = await fetch(`${BACKEND_API_URL}/api/lessons/${lessonId}/answer-frames/count`);
+    if (!response.ok) throw new Error('Failed to fetch answer frames count');
+    return response.json();
+  },
 };
 
 // Auth API calls
