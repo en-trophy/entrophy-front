@@ -1,0 +1,106 @@
+/* Session Expired Modal */
+.session-expired-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.session-expired-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 64px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+  max-width: 500px;
+  width: 90%;
+}
+
+.session-expired-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: bounce 0.6s ease;
+}
+
+.session-expired-modal h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #d13438;
+  margin-bottom: 16px;
+}
+
+.session-expired-modal p {
+  font-size: 18px;
+  color: #605e5c;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.session-expired-button {
+  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+}
+
+.session-expired-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .session-expired-modal {
+    padding: 32px 24px;
+  }
+
+  .session-expired-modal h2 {
+    font-size: 28px;
+  }
+
+  .session-expired-icon {
+    font-size: 64px;
+  }
+}

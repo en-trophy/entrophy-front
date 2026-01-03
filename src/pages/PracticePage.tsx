@@ -22,9 +22,12 @@ export default function PracticePage() {
     message: string;
     score: number;
   } | null>(null);
+  const [showHint, setShowHint] = useState(false);
+  const [frameCount, setFrameCount] = useState<number>(1);
 
   useEffect(() => {
     loadLesson();
+    loadFrameCount();
   }, [lessonId]);
 
   useEffect(() => {
@@ -49,6 +52,19 @@ export default function PracticePage() {
       console.error('Failed to load lesson:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadFrameCount = async () => {
+    if (!lessonId) return;
+
+    try {
+      const numericId = parseInt(lessonId, 10);
+      const data = await backendApi.getAnswerFramesCount(numericId);
+      setFrameCount(data.frameCount);
+    } catch (err) {
+      console.error('Failed to load frame count:', err);
+      setFrameCount(1); // 기본값
     }
   };
 
@@ -96,8 +112,8 @@ export default function PracticePage() {
   if (loading) {
     return (
       <div className="practice-page">
+        <Header />
         <div className="practice-container">
-          <Header />
           <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px' }}>
             Loading...
           </div>
@@ -109,8 +125,8 @@ export default function PracticePage() {
   if (!lesson) {
     return (
       <div className="practice-page">
+        <Header />
         <div className="practice-container">
-          <Header />
           <div style={{ textAlign: 'center', padding: '48px', fontSize: '18px', color: '#d13438' }}>
             Lesson not found.
           </div>
@@ -121,9 +137,9 @@ export default function PracticePage() {
 
   return (
     <div className="practice-page">
-      <div className="practice-container">
-        <Header />
+      <Header />
 
+      <div className="practice-container">
         <div className="practice-header">
           <button className="practice-exit-button" onClick={handleExit}>
             ← Exit
@@ -132,6 +148,10 @@ export default function PracticePage() {
         </div>
 
         <ScoreBoard score={score} targetWord={lesson.title} feedback={currentFeedback?.message} />
+
+        <div className="practice-info">
+          📸 After 5 seconds, {frameCount} {frameCount === 1 ? 'photo' : 'photos'} will be taken
+        </div>
 
         <div style={{ position: 'relative' }}>
           <Camera
@@ -155,15 +175,44 @@ export default function PracticePage() {
         </div>
 
         <div className="practice-controls">
-          {lesson.signLanguage && (
-            <div className="practice-tips">
-              <strong>💡 Tip:</strong> {lesson.signLanguage}
-            </div>
-          )}
+          <button className="practice-hint-button" onClick={() => setShowHint(!showHint)}>
+            💡 {showHint ? 'Hide Hint' : 'Show Hint'}
+          </button>
           <button className="practice-complete-button" onClick={handleComplete}>
             Complete Learning
           </button>
         </div>
+
+        {/* Hint Section */}
+        {showHint && (
+          <div className="practice-hint-section">
+            {lesson.videoUrl ? (
+              <div className="hint-video-container">
+                <video
+                  src={lesson.videoUrl}
+                  controls
+                  autoPlay
+                  loop
+                  className="hint-video"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : lesson.imageUrl ? (
+              <div className="hint-image-container">
+                <img
+                  src={lesson.imageUrl}
+                  alt={`${lesson.title} hint`}
+                  className="hint-image"
+                />
+              </div>
+            ) : (
+              <div className="hint-no-media">
+                No visual hint available for this lesson.
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Success Modal */}
