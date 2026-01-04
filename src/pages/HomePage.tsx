@@ -46,10 +46,8 @@ export default function HomePage() {
     }
   };
 
-  const handleSearch = async (keyword: string) => {
-    setSearchKeyword(keyword);
-
-    if (!keyword.trim()) {
+  const performSearch = async () => {
+    if (!searchKeyword.trim()) {
       setSearchResults([]);
       setIsSearching(false);
       return;
@@ -57,11 +55,17 @@ export default function HomePage() {
 
     try {
       setIsSearching(true);
-      const results = await backendApi.searchLessons(keyword);
+      const results = await backendApi.searchLessons(searchKeyword);
       setSearchResults(results);
     } catch (err) {
       console.error('Failed to search lessons:', err);
       setSearchResults([]);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      performSearch();
     }
   };
 
@@ -103,8 +107,21 @@ export default function HomePage() {
               className="search-input"
               placeholder="Search lessons (e.g., 'hello', 'thank you'...)"
               value={searchKeyword}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
             />
+            <button className="search-button" onClick={performSearch}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="11" cy="11" r="6" strokeWidth="2" />
+                <path d="M20 20L15.5 15.5" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
             {searchKeyword && (
               <button className="search-clear-button" onClick={handleClearSearch}>
                 ✕
