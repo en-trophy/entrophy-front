@@ -55,6 +55,13 @@ export const backendApi = {
     return response.json();
   },
 
+  // Search lessons by keyword
+  async searchLessons(keyword: string): Promise<Lesson[]> {
+    const response = await fetch(`${BACKEND_API_URL}/api/lessons?keyword=${encodeURIComponent(keyword)}`);
+    if (!response.ok) throw new Error('Failed to search lessons');
+    return response.json();
+  },
+
   // Get answer frames count for a lesson
   async getAnswerFramesCount(lessonId: number): Promise<{ lessonId: number; frameCount: number }> {
     const response = await fetch(`${BACKEND_API_URL}/api/lessons/${lessonId}/answer-frames/count`);

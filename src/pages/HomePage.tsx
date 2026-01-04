@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import SidebarNav from '../components/SidebarNav';
 import { backendApi } from '../services/api';
-import type { Category } from '../types';
+import type { Category, Lesson } from '../types';
 import { getCategoryColor } from '../types';
 import './HomePage.css';
 
@@ -13,6 +13,9 @@ export default function HomePage() {
   const [lessonCounts, setLessonCounts] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchResults, setSearchResults] = useState<Lesson[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     void loadCategories();
@@ -43,6 +46,31 @@ export default function HomePage() {
     }
   };
 
+  const handleSearch = async (keyword: string) => {
+    setSearchKeyword(keyword);
+
+    if (!keyword.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      const results = await backendApi.searchLessons(keyword);
+      setSearchResults(results);
+    } catch (err) {
+      console.error('Failed to search lessons:', err);
+      setSearchResults([]);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchKeyword('');
+    setSearchResults([]);
+    setIsSearching(false);
+  };
+
   const content = (() => {
     if (loading) {
       return (
@@ -64,10 +92,82 @@ export default function HomePage() {
       <>
         <section className="hero-section">
           <h2 className="hero-title">What would you like to learn?</h2>
-          <p className="hero-subtitle">Select a category to start learning sign language</p>
+          <p className="hero-subtitle">
+            {isSearching ? 'Search results' : 'Select a category to start learning sign language'}
+          </p>
+
+          {/* Search Bar */}
+          <div className="search-container">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search lessons (e.g., 'hello', 'thank you'...)"
+              value={searchKeyword}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            {searchKeyword && (
+              <button className="search-clear-button" onClick={handleClearSearch}>
+                ✕
+              </button>
+            )}
+          </div>
         </section>
 
-        <section className="categories-grid">
+        {/* Search Results */}
+        {isSearching && (
+          <section className="search-results">
+            {searchResults.length > 0 ? (
+              <>
+                <div className="search-results-header">
+                  Found {searchResults.length} {searchResults.length === 1 ? 'lesson' : 'lessons'}
+                </div>
+                <div className="search-results-grid">
+                  {searchResults.map((lesson) => (
+                    <button
+                      key={lesson.id}
+                      className="search-result-card"
+                      onClick={() => navigate(`/lesson/${lesson.id}`)}
+                    >
+                      <div className="search-result-header">
+                        <h3 className="search-result-title">{lesson.title}</h3>
+                        <span className="search-result-type">{lesson.type}</span>
+                      </div>
+                      <div className="search-result-category">{lesson.categoryName}</div>
+                      {lesson.videoUrl && (
+                        <div className="search-result-video">
+                          <video
+                            src={lesson.videoUrl}
+                            muted
+                            loop
+                            playsInline
+                            onMouseEnter={(e) => e.currentTarget.play()}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.pause();
+                              e.currentTarget.currentTime = 0;
+                            }}
+                          />
+                        </div>
+                      )}
+                      {lesson.imageUrl && !lesson.videoUrl && (
+                        <div className="search-result-image">
+                          <img src={lesson.imageUrl} alt={lesson.title} />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="search-no-results">
+                No lessons found for "{searchKeyword}"
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Categories Grid */}
+        {!isSearching && (
+          <section className="categories-grid">
           {categories.map((category) => {
             const lessonCount = lessonCounts.get(category.id) || 0;
             const hasLessons = lessonCount > 0;
@@ -97,7 +197,8 @@ export default function HomePage() {
               </button>
             );
           })}
-        </section>
+          </section>
+        )}
 
         <footer className="home-footer">
           <p className="home-footer-text">
