@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(searchParams.get('signup') === 'true');
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,13 @@ export default function LoginPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -51,6 +59,7 @@ export default function LoginPage() {
     setShowSuccessModal(false);
     setIsSignup(false);
     setPassword('');
+    setConfirmPassword('');
     setName('');
   };
 
@@ -127,6 +136,20 @@ export default function LoginPage() {
                   minLength={6}
                 />
               </div>
+
+              {isSignup && (
+                <div className="form-group">
+                  <label>Confirm Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter your password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              )}
 
               {error && <div className="error-message">{error}</div>}
 
