@@ -1,13 +1,23 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogoClick = () => {
+    // If already on homepage, force reload to reset search state
+    if (location.pathname === '/') {
+      window.location.href = '/';
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <header className="header">
       <div className="header-content">
-        <div className="header-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <div className="header-logo" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
           <img src="/equal_sign_logo.svg" alt="EqualSign Logo" width="32" height="32" />
           <h1 className="header-title">Equal Sign</h1>
         </div>
