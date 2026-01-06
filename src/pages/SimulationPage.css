@@ -4,7 +4,63 @@
   padding: 24px;
 }
 
-.simulation-loading,
+.simulation-loading {
+  text-align: center;
+  padding: 80px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 64px;
+  height: 64px;
+  border: 6px solid #e1dfdd;
+  border-top: 6px solid #0078d4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 32px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #323130;
+  margin: 0 0 12px 0;
+  animation: fadeInUp 0.5s ease;
+}
+
+.loading-subtitle {
+  font-size: 16px;
+  color: #605e5c;
+  margin: 0;
+  line-height: 1.5;
+  animation: fadeInUp 0.7s ease;
+  white-space: nowrap;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .simulation-error {
   text-align: center;
   padding: 64px 32px;
