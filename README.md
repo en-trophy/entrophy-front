@@ -292,6 +292,6 @@ MIT License
 
 ---
 
-**Made with ❤️ for Microsoft Imagine Cup 2024**
+**Made with ❤️ for Microsoft Imagine Cup 2026**
 
 **Team**: en-trophy
