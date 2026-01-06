@@ -477,7 +477,11 @@ export default function SimulationPage() {
           <main className="page-content">
             <div className="page-container">
               <Header />
-              <div className="simulation-loading">Loading simulation...</div>
+              <div className="simulation-loading">
+                <div className="loading-spinner"></div>
+                <h2 className="loading-title">Preparing Your Practice Session</h2>
+                <p className="loading-subtitle">Creating personalized scenarios based on today's lessons...</p>
+              </div>
             </div>
           </main>
         </div>
