@@ -1,160 +1,297 @@
-# EqualSign 👋
+# Equal Sign 👋
 
-> AI와 함께 배우는 수어 교육 플랫폼
+> AI-Powered Sign Language Learning Platform
 
-Microsoft Imagine Cup을 위한 프로젝트입니다. Azure AI Vision과 OpenAI를 활용하여 수어를 배우는 학생들에게 실시간 피드백을 제공하는 AI 튜터입니다.
+An AI tutor that provides real-time feedback to students learning sign language using Azure AI and OpenAI. Built for Microsoft Imagine Cup.
 
-## 🎯 핵심 기능
+## 🎯 Key Features
 
-- 🎥 **웹캠 기반 실시간 학습**: 카메라 앞에서 수어 동작을 연습
-- 🎨 **시각적 피드백**: 색깔로 정확도 표시 (초록/노랑/빨강)
-- 📊 **점수 시스템**: 실시간 정확도 점수 계산
-- 🤖 **AI 기반 추적**: 손가락 관절 21개 포인트 정밀 추적
-- 💬 **격려 메시지**: Azure OpenAI로 학습자 맞춤 피드백
-- 📚 **체계적 학습**: 카테고리별 단어/문장 학습 플로우
+### Learning Features
+- 🎥 **Real-time Webcam Learning**: Practice sign language in front of your camera
+- 🎨 **Visual Feedback**: Color-coded accuracy indicators (Green/Yellow/Red)
+- 📊 **Scoring System**: Real-time accuracy scoring
+- 🤖 **AI-Based Tracking**: Precise tracking of 21 hand joint points using MediaPipe
+- 💬 **Personalized Feedback**: Custom learning feedback powered by Azure OpenAI
+- 📚 **Structured Learning**: Categorized word/phrase learning flow
+- 🔍 **Smart Search**: Quick lesson search functionality
+- 🎯 **Practice Today**: Daily review simulation based on learned lessons
 
-## 📸 스크린샷
+### User Features
+- 🔐 **User Authentication**: Secure login and signup system
+- ⏰ **Session Management**: 60-minute session timeout for security
+- 📈 **Learning History**: Track your progress over time
+- 👤 **User Profile**: View your learning statistics and achievements
+- 📅 **Daily Practice**: Review lessons you've learned today
 
-### 홈 화면
-<img width="1500" height="895" alt="Image" src="https://github.com/user-attachments/assets/863f9b5d-0247-4934-9189-24f080724ab4" />
+### Technical Features
+- 📸 **Multi-frame Capture**: Dynamic sign language recognition with multiple frames
+- 🎬 **Video/Image Support**: Flexible media types for different lesson modes
+- 🌐 **RESTful API Integration**: Seamless backend communication
+- 🎨 **Responsive Design**: Works on desktop and mobile devices
 
-### 학습 화면
-<img width="1283" height="940" alt="Image" src="https://github.com/user-attachments/assets/6c7c2b60-1fea-470c-987f-0a4ea682382f" />
+## 📸 Screenshots
 
-### 결과 화면
-<img width="1077" height="670" alt="Image" src="https://github.com/user-attachments/assets/e2479168-25c5-45c1-857d-21dd43ff7a70" />
+### Home Screen
+<!-- Add your screenshot here -->
+<img width="1500" alt="Home Screen" src="" />
 
+### Search Feature
+<!-- Add your screenshot here -->
+<img width="1500" alt="Search Feature" src="" />
 
-## 🛠 기술 스택
+### Practice Mode
+<!-- Add your screenshot here -->
+<img width="1500" alt="Practice Mode" src="" />
 
-### 프론트엔드
-- React 18
-- TypeScript
-- Vite
-- React Router
-- HTML5 Canvas
-- WebRTC (웹캠)
+### Practice Today (Simulation)
+<!-- Add your screenshot here -->
+<img width="1500" alt="Practice Today" src="" />
 
-### 백엔드 (다른 팀원 담당)
-- Azure AI Vision (손 추적)
-- Azure OpenAI Service (피드백 생성)
-- Azure Static Web Apps (배포)
+### Learning History
+<!-- Add your screenshot here -->
+<img width="1500" alt="Learning History" src="" />
 
-## 📁 프로젝트 구조
+### Result Screen
+<!-- Add your screenshot here -->
+<img width="1500" alt="Result Screen" src="" />
+
+## 🛠 Tech Stack
+
+### Frontend
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **React Router** - Navigation
+- **MediaPipe Holistic** - Hand/pose tracking
+- **WebRTC** - Webcam access
+- **HTML5 Canvas** - Skeleton rendering
+
+### Backend APIs
+- **Azure AI** - Computer vision and pose analysis
+- **Azure OpenAI** - Feedback generation
+- **RESTful API** - Backend integration
+- **JWT Authentication** - Secure user sessions
+
+### Deployment
+- **Azure Static Web Apps** - Frontend hosting
+- **Azure App Service** - Backend API hosting
+
+## 📁 Project Structure
 
 ```
 src/
 ├── pages/
-│   ├── HomePage.tsx              # 홈 (카테고리 선택)
-│   ├── CategoryDetailPage.tsx    # 레벨 선택 (단어/문장)
-│   ├── ItemListPage.tsx          # 레슨 목록
-│   ├── LessonDetailPage.tsx      # 레슨 상세
-│   ├── PracticePage.tsx          # 실시간 학습
-│   └── ResultPage.tsx            # 학습 결과
+│   ├── HomePage.tsx              # Home (category selection + search)
+│   ├── CategoryDetailPage.tsx    # Level selection (word/phrase)
+│   ├── ItemListPage.tsx          # Lesson list
+│   ├── LessonDetailPage.tsx      # Lesson details
+│   ├── PracticePage.tsx          # Real-time learning
+│   ├── SimulationPage.tsx        # Practice Today mode
+│   ├── ResultPage.tsx            # Learning results
+│   ├── ProfilePage.tsx           # User profile & history
+│   └── LoginPage.tsx             # Login & signup
 ├── components/
-│   ├── Camera.tsx                # 웹캠 + Canvas 렌더링
-│   ├── ScoreBoard.tsx            # 점수판
-│   └── Header.tsx                # 헤더
-├── data/
-│   ├── categories.ts             # 카테고리 데이터
-│   └── lessons.ts                # 레슨 데이터
-├── utils/
-│   └── skeleton.ts               # Skeleton 렌더링 로직
+│   ├── Camera.tsx                # Webcam + MediaPipe integration
+│   ├── ScoreBoard.tsx            # Score display
+│   ├── Header.tsx                # Header component
+│   ├── SidebarNav.tsx            # Navigation sidebar
+│   └── SessionTimeoutChecker.tsx # Session timeout handler
+├── services/
+│   ├── api.ts                    # API client
+│   └── authService.ts            # Authentication service
 ├── types/
-│   └── index.ts                  # TypeScript 타입 정의
-└── App.tsx                       # 라우터 설정
+│   └── index.ts                  # TypeScript type definitions
+└── App.tsx                       # Router configuration
 ```
 
-## 🚀 시작하기
+## 🚀 Getting Started
 
-### 1. 의존성 설치
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Webcam access
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. 개발 서버 실행
+### 2. Environment Setup
+Create a `.env.development` file:
+```env
+VITE_BACKEND_API_URL=your_backend_api_url
+VITE_AI_API_URL=your_ai_api_url
+```
+
+### 3. Run Development Server
 ```bash
 npm run dev
 ```
 
-브라우저에서 http://localhost:5173 으로 접속
+Open http://localhost:5173 in your browser
 
-### 3. 빌드
+### 4. Build for Production
 ```bash
 npm run build
 ```
 
-## 💡 사용 방법
+## 💡 How to Use
 
-1. 홈 화면에서 카테고리 선택 (인사, 감정, 일상, 가족 등)
-2. 단어 학습 또는 문장 학습 선택
-3. 레슨 목록에서 학습할 항목 선택
-4. 레슨 상세에서 설명과 팁 확인
-5. "학습 시작하기" 클릭
-6. 웹캠 권한을 허용하고 정답 skeleton 따라하기
-7. 실시간으로 색깔 피드백 확인:
-   - 🟢 **초록**: 정확한 동작
-   - 🟡 **노랑**: 보통 수준
-   - 🔴 **빨강**: 교정 필요
-8. "학습 완료" 버튼으로 결과 확인
+### Basic Learning Flow
+1. **Sign Up / Login** - Create an account or log in
+2. **Browse Categories** - Select from 8 different categories (Greetings, Emotions, Daily Life, etc.)
+3. **Choose Level** - Pick between Word or Phrase learning
+4. **Select Lesson** - Browse and select a lesson to learn
+5. **View Lesson Details** - Study the tutorial video and instructions
+6. **Start Practice** - Click "Start Learning" button
+7. **Allow Webcam** - Grant camera permission
+8. **Practice Sign Language** - Follow the on-screen guidance
+9. **Get Real-time Feedback** - See color-coded feedback:
+   - 🟢 **Green**: Accurate movement
+   - 🟡 **Yellow**: Moderate accuracy
+   - 🔴 **Red**: Needs correction
+10. **Complete Learning** - Click "Complete Learning" to see your results
 
-## 🔌 백엔드 연동
+### Practice Today Mode
+1. Click **"Practice Today"** in the sidebar
+2. System creates scenarios based on lessons you learned today
+3. Practice in realistic conversation contexts
+4. Get AI-powered feedback on your performance
 
-현재는 샘플 데이터로 작동합니다. 실제 AI 서버 연동은 다음 단계입니다:
+### Search Feature
+1. Use the search bar on the home page
+2. Type keywords (e.g., "hello", "thank")
+3. Press Enter or click the search icon
+4. Browse search results with video previews
 
-### Camera.tsx의 AI 서버 호출 부분 (TODO)
-```typescript
-// Camera.tsx 라인 ~140
-// 여기서 video 프레임을 캡처해서 AI 서버로 전송
-// 응답으로 받은 userJoints를 setLatestUserJoints에 설정
+### Profile & History
+1. Click **"Learning History"** or **"Profile"** in the sidebar
+2. View your learning statistics
+3. Track daily progress
+4. See total lessons completed and average scores
+
+## 🔐 Authentication
+
+### Session Management
+- **Session Duration**: 60 minutes
+- **Auto Logout**: Automatic logout after session expires
+- **Session Timeout Modal**: Notification when session expires
+- **Secure Token Storage**: JWT tokens in localStorage
+
+### Features
+- User registration with validation
+- Secure login with password confirmation
+- Protected routes requiring authentication
+- Persistent login across page refreshes
+
+## 🎨 Design System
+
+### Colors
+- **Primary**: Azure Blue (#0078D4)
+- **Secondary**: #005A9E
+- **Success**: #16C60C
+- **Warning**: #FFB800
+- **Error**: #D13438
+- **Background**: White with subtle gradients
+- **Text**: #323130 (Primary), #605E5C (Secondary)
+
+### Typography
+- **Font Family**: System UI fonts (Segoe UI, San Francisco, etc.)
+- **Headings**: Bold, 24-48px
+- **Body**: Regular, 14-18px
+
+## 📚 Learning Categories
+
+- 👋 **Greetings**: Basic greetings for meetings and farewells
+- 😊 **Emotions**: Express joy, sadness, anger, etc.
+- 🏠 **Daily Life**: Common expressions in daily life
+- 👪 **Family**: Family relationships and titles
+- 🏫 **School**: School-related expressions
+- 🍽️ **Reactions**: Expressions like "thank you", "sorry"
+- ✋ **Alphabet**: Fingerspelling alphabet
+- 🔢 **Numbers**: Finger counting and numbers
+
+## 🤖 AI Integration
+
+### MediaPipe Holistic
+- Real-time hand tracking (21 landmarks per hand)
+- Pose tracking (33 landmarks)
+- Face tracking for comprehensive analysis
+
+### Azure OpenAI
+- Personalized feedback generation
+- Context-aware coaching messages
+- Performance analysis
+
+### Computer Vision API
+- Multi-frame capture for dynamic signs
+- Pose comparison and scoring
+- Accurate gesture recognition
+
+## 🌟 Imagine Cup Highlights
+
+- ♿ **Social Impact**: Improving education accessibility for deaf communities
+- ☁️ **Azure Technology**: AI Vision + OpenAI + App Service + Static Web Apps
+- 🎨 **Visual Impact**: Real-time feedback creates powerful demonstrations
+- 🌍 **Scalability**: Can support sign languages from different countries
+- 📱 **User Experience**: Intuitive learning flow
+- 🔬 **Innovation**: AI-powered personalized learning at scale
+
+## 🔄 API Endpoints
+
+### Backend API
+```
+GET  /api/categories                     # Get all categories
+GET  /api/lessons                        # Get all lessons
+GET  /api/lessons/:id                    # Get specific lesson
+GET  /api/lessons/category/:categoryId   # Get lessons by category
+GET  /api/lessons/:id/answer-frames/count # Get frame count for lesson
+POST /api/auth/signup                    # User registration
+POST /api/auth/login                     # User login
+GET  /api/learning-histories             # Get learning history
+POST /api/learning-histories             # Save learning record
 ```
 
-### API 엔드포인트 예시
+### AI API
 ```
-POST /api/analyze-pose
-Body: { image: base64EncodedFrame }
-Response: { userJoints: Joint[], score: number }
+POST /api/lessons/:id/feedback/image     # Single frame analysis
+POST /api/lessons/:id/feedback/images    # Multi-frame analysis
+POST /api/simulation                     # Create practice scenario
 ```
 
-## 🎨 디자인 시스템
+## 📝 Roadmap
 
-- **주 색상**: Azure Blue (#0078D4)
-- **보조 색상**: #005A9E
-- **배경**: Light Gray Gradient
-- **폰트**: Segoe UI (Microsoft 기본 폰트)
+### Completed ✅
+- [x] User authentication system
+- [x] Session management with timeout
+- [x] Search functionality
+- [x] Learning history tracking
+- [x] Practice Today simulation mode
+- [x] Multi-frame capture for dynamic signs
+- [x] Real-time AI feedback
+- [x] Profile page with statistics
+- [x] MediaPipe integration
 
-## 📚 학습 카테고리
+### Upcoming 🚀
+- [ ] Achievement system (badges, levels)
+- [ ] Social features (share progress)
+- [ ] More sign language lessons
+- [ ] Multi-language UI support
+- [ ] Mobile app version
+- [ ] Offline mode support
+- [ ] Video recording and playback
+- [ ] Leaderboard and competitions
 
-- 👋 **인사**: 만남과 헤어짐의 기본 인사
-- 😊 **감정**: 기쁨, 슬픔, 화남 등 감정 표현
-- 🏠 **일상**: 일상생활에서 자주 쓰는 표현
-- 👪 **가족**: 가족 관계와 호칭
-- 🏫 **학교**: 학교생활 관련 표현
-- 🍽️ **식사**: 음식과 식사 관련 표현
-- ✋ **알파벳**: 손가락으로 표현하는 알파벳
-- 🔢 **숫자**: 손가락으로 표현하는 숫자
+## 🤝 Contributing
 
-## 🌟 Imagine Cup을 위한 특징
+This project was built for Microsoft Imagine Cup. Contributions are welcome!
 
-- ♿ **사회적 영향**: 청각 장애인 교육 접근성 향상
-- ☁️ **Azure 기술 활용**: AI Vision + OpenAI + Static Web Apps
-- 🎨 **시각적 임팩트**: 실시간 피드백으로 강력한 데모
-- 🌍 **확장 가능성**: 다양한 언어의 수어 지원 가능
-- 📱 **사용자 경험**: 직관적인 학습 플로우
-
-## 📝 다음 단계
-
-- [ ] AI 서버와 실제 연동
-- [ ] 학습 진행도 저장 (LocalStorage or 백엔드)
-- [ ] 더 많은 수어 단어 추가
-- [ ] 성취 시스템 (배지, 레벨)
-- [ ] 다국어 지원
-- [ ] Azure Static Web Apps 배포
-
-## 📄 라이선스
+## 📄 License
 
 MIT License
 
 ---
 
-**Made with ❤️ for Microsoft Imagine Cup**
+**Made with ❤️ for Microsoft Imagine Cup 2024**
+
+**Team**: en-trophy
