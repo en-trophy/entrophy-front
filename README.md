@@ -33,27 +33,27 @@ An AI tutor that provides real-time feedback to students learning sign language 
 
 ### Home Screen
 <!-- Add your screenshot here -->
-<img width="1500" alt="Home Screen" src="" />
+<img width="1500" alt="Home Screen" src="https://github.com/user-attachments/assets/08fcc63e-9ef0-44e2-9c89-20965c58b1a4" />
 
 ### Search Feature
 <!-- Add your screenshot here -->
-<img width="1500" alt="Search Feature" src="" />
+<img width="1500" alt="Search Feature" src="https://github.com/user-attachments/assets/31def8f2-f1cd-4c9a-a090-0f4f27b76e73" />
 
 ### Practice Mode
 <!-- Add your screenshot here -->
-<img width="1500" alt="Practice Mode" src="" />
+<img width="1500" alt="Practice Mode" src="https://github.com/user-attachments/assets/e54e879f-ab9f-488f-bb10-bc3f400eaf84" />
 
 ### Practice Today (Simulation)
 <!-- Add your screenshot here -->
-<img width="1500" alt="Practice Today" src="" />
+<img width="1500" alt="Practice Today" src="https://github.com/user-attachments/assets/2ed30576-7482-4023-b44e-165fa09d96a6" />
 
 ### Learning History
 <!-- Add your screenshot here -->
-<img width="1500" alt="Learning History" src="" />
+<img width="1500" alt="Learning History" src="https://github.com/user-attachments/assets/044927ed-ce9d-477d-90d1-ed9f49283bf4" />
 
 ### Result Screen
 <!-- Add your screenshot here -->
-<img width="1500" alt="Result Screen" src="" />
+<img width="1500" alt="Result Screen" src="https://github.com/user-attachments/assets/35eeb8da-3481-478d-aedc-6f7e2c1f4af5" />
 
 ## 🛠 Tech Stack
 
