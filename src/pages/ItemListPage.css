@@ -59,17 +59,21 @@
 
 .lesson-card {
   background: white;
+  border: 2px solid #e1dfdd;
   border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: left;
   display: flex;
   flex-direction: column;
 }
 
 .lesson-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 120, 212, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 120, 212, 0.15);
+  border-color: #0078d4;
 }
 
 .lesson-card-header {
@@ -102,25 +106,23 @@
   color: #605e5c;
   line-height: 1.6;
   margin: 0 0 16px 0;
-  flex: 1;
 }
 
-.lesson-card-button {
-  background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.lesson-card-video,
+.lesson-card-image {
   width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f2f1;
+  margin-bottom: 16px;
 }
 
-.lesson-card-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+.lesson-card-video video,
+.lesson-card-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
 }
 
 .no-lessons {

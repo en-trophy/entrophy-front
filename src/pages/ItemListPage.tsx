@@ -128,7 +128,11 @@ export default function ItemListPage() {
             </div>
           ) : (
             lessons.map((lesson) => (
-              <div key={lesson.id} className="lesson-card">
+              <button
+                key={lesson.id}
+                className="lesson-card"
+                onClick={() => navigate(`/lesson/${lesson.id}`)}
+              >
                 <div className="lesson-card-header">
                   <h3 className="lesson-card-title">{lesson.title}</h3>
                   <span
@@ -139,13 +143,27 @@ export default function ItemListPage() {
                   </span>
                 </div>
                 <p className="lesson-card-description">{lesson.signLanguage}</p>
-                <button
-                  className="lesson-card-button"
-                  onClick={() => navigate(`/lesson/${lesson.id}`)}
-                >
-                  Start Learning →
-                </button>
-              </div>
+                {lesson.videoUrl && (
+                  <div className="lesson-card-video">
+                    <video
+                      src={lesson.videoUrl}
+                      muted
+                      loop
+                      playsInline
+                      onMouseEnter={(e) => e.currentTarget.play()}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.pause();
+                        e.currentTarget.currentTime = 0;
+                      }}
+                    />
+                  </div>
+                )}
+                {lesson.imageUrl && !lesson.videoUrl && (
+                  <div className="lesson-card-image">
+                    <img src={lesson.imageUrl} alt={lesson.title} />
+                  </div>
+                )}
+              </button>
             ))
           )}
         </section>
